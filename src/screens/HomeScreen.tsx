@@ -43,6 +43,8 @@ interface WorkoutLog {
 };
 
 const HomeScreen = () => {
+    const [currentPhase, setCurrentPhase] = useState<string | null>(null);
+    const [cycleDay, setCycleDay] = useState<number | null>(null);
     const [workoutLog, setWorkoutLog] = useState<WorkoutLog | null>(null);
     const [workoutDetails, setWorkoutDetails] = useState<Workout | null>(null);
     const [isLoading, setIsLoading] = useState(true);

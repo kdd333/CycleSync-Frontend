@@ -46,6 +46,7 @@ const CalendarScreen = () => {
 
   useEffect(() => {
     fetchWorkoutLogs(); 
+    fetchPeriodDates();
   }, []);
 
   const fetchWorkoutLogs = async () => {
@@ -74,17 +75,60 @@ const CalendarScreen = () => {
     }
   };
 
-  const handleLogPeriod = () => {
-    if (isPeriodLogged) {
-      // remove logged period if already logged
-      const updateLoggedDates = {...loggedDates};
-      delete updateLoggedDates[selectedDate];
-      setLoggedDates(updateLoggedDates);
-    } else {
-      // log period
-      setLoggedDates({...loggedDates, [selectedDate]: { selected: true, selectedColor: '#ff00006f' }});
-    };
-    setIsPeriodLogged(!isPeriodLogged);
+  const fetchPeriodDates = async () => {
+    try {
+      const accessToken = await AsyncStorage.getItem('accessToken');
+      const response = await fetch('http://192.168.1.182:8000/api/period-dates/', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const markedDates = data.period_dates.reduce(
+          (acc: { [key: string]: { selected: boolean; selectedColor: string } }, date: string) => {
+          acc[date] = { selected: true, selectedColor: '#F17CBB' };
+          return acc;
+        }, {});
+        setLoggedDates(markedDates);
+      } else {
+        console.log('Failed to fetch period dates:', response.status, response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching period dates:', error);
+    }
+  };
+
+  const handleLogPeriod = async () => {
+    try {
+      const accessToken = await AsyncStorage.getItem('accessToken');
+      const response = await fetch('http://192.168.1.182:8000/api/log-period/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ date: selectedDate }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setLoggedDates((prev) => ({
+          ...prev,
+          [selectedDate]: { selected: true, selectedColor: '#F17CBB' },
+        }));
+        Alert.alert('Success', data.message);
+      } else {
+        const errorData = await response.json();
+        Alert.alert('Error', errorData.error || 'Failed to log period.');
+      }
+    } catch (error) {
+      console.error('Error logging period:', error);
+      Alert.alert('Error', 'Failed to log period. Please try again.');
+    }
   };
 
   const handleAddWorkout = () => {

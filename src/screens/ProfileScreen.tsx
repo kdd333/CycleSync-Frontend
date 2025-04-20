@@ -6,6 +6,7 @@ import KeyIcon from '../assets/icons/key.svg';
 import MoonIcon from '../assets/icons/moon.svg';
 import ScrollIcon from '../assets/icons/scroll.svg';
 import RightArrowIcon from '../assets/icons/rightarrow.svg';
+import Button from '../components/Button';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -18,8 +19,13 @@ type ProfileScreenProps = {
 const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
     const [darkMode, setDarkMode] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
-    const [name, setName] = useState('Khadijah Darragi');
-    const [email, setEmail] = useState('khadijahdarragi@gmail.com');
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [menstrualLength, setMenstrualLength] = useState<number>(5);
+    const [follicularLength, setFollicularLength] = useState<number>(10);
+    const [ovulationLength, setOvulationLength] = useState<number>(1);
+    const [lutealLength, setLutealLength] = useState<number>(12);
+    const [isEditingLengths, setIsEditingLengths] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
 
     useEffect(() => { 
@@ -47,8 +53,12 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
 
             if (response.ok) {
                 const data = await response.json();
-                setName(data.name);   // update name and email with fetched data
+                setName(data.name);   
                 setEmail(data.email);
+                setMenstrualLength(data.menstrual_length);
+                setFollicularLength(data.follicular_length);
+                setOvulationLength(data.ovulation_length);
+                setLutealLength(data.luteal_length);
             } else {
                 console.log('Failed to fetch user details:', response.statusText);
                 Alert.alert('Error', 'Failed to fetch user details. Please try again later.');
@@ -86,6 +96,10 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
                 body: JSON.stringify({
                     name: name,
                     email: email,
+                    menstrual_length: menstrualLength,
+                    follicular_length: follicularLength,
+                    ovulation_length: ovulationLength,
+                    luteal_length: lutealLength,
                 }),
             });
 
@@ -102,6 +116,36 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
         } catch (error) {
             console.error('Error updating user details:', error);
             Alert.alert('Error', 'An error occurred while updating user details. Please try again later.');
+        }
+    };
+
+    const handleSavePhaseLengths = async () => {
+        try {
+            const accessToken = await AsyncStorage.getItem('accessToken'); 
+            const response = await fetch('http://192.168.182:8000/api/user/', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`, 
+                },
+                body: JSON.stringify({
+                    menstrual_length: menstrualLength,
+                    follicular_length: follicularLength,
+                    ovulation_length: ovulationLength,
+                    luteal_length: lutealLength,
+                }),
+            });
+
+            if (response.ok) {
+                Alert.alert('Success', 'Phase lengths saved successfully!');
+            } else {
+                console.log('Failed to save phase lengths:', response.status, response.statusText);
+                Alert.alert('Error', 'Failed to save phase lengths. Please try again later.');
+            }
+
+        } catch (error) {
+            console.error('Error saving phase lengths:', error);
+            Alert.alert('Error', 'An error occurred while saving phase lengths. Please try again later.');
         }
     };
 
@@ -162,24 +206,81 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
                         source={require('../assets/icons/user.svg')} // replace with profile image
                         style={styles.avatar}
                     />
-                    <TouchableOpacity style={styles.editIcon}>
-                        <EditIcon width={20} height={20} fill="#F17CBB" />
-                    </TouchableOpacity>
+                    {isEditing ? (
+                        <TouchableOpacity style={styles.editIcon}>
+                            <EditIcon width={20} height={20} fill="#F17CBB" />
+                        </TouchableOpacity>
+                    ) : (
+                        <></>
+                    )}
                 </View>
                 {isEditing ? (
                     <>
-                        <TextInput
-                            style={styles.input}
-                            value={name}
-                            onChangeText={setName}
-                            placeholder='Name'
-                        />
-                        <TextInput
-                            style={styles.input}
-                            value={email}
-                            onChangeText={setEmail}
-                            placeholder='Email Address'
-                        />
+                        <View style={styles.editDetailsSection}>
+                            <View style={styles.editDetailsRow}>
+                                <Text>Name:</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    value={name}
+                                    onChangeText={setName}
+                                    placeholder='Name'
+                                />
+                            </View>
+                            <View style={styles.editDetailsRow}>
+                                <Text>Email:</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    value={email}
+                                    onChangeText={setEmail}
+                                    placeholder='Email Address'
+                                />
+                            </View>
+                        </View>
+
+                        <View style={styles.editPhasesSection}>
+                            {/* Edit Cycle Lengths Section */}
+                            <Text style={styles.sectionTitle}>My Menstrual Cycle Lengths:</Text>
+                            <View style={styles.phaseLengthContainer}>
+                                <Text style={styles.sectionSubTitle}>Menstrual Phase:</Text>
+                                <TextInput
+                                    style={styles.phaseLengthInput}
+                                    value={menstrualLength.toString()}
+                                    onChangeText={(text) => setMenstrualLength(Number(text))}
+                                    keyboardType="numeric"
+                                    placeholder="Period Length"
+                                />
+                            </View>
+                            <View style={styles.phaseLengthContainer}>
+                                <Text style={styles.sectionSubTitle}>Follicular Phase:</Text>
+                                <TextInput
+                                    style={styles.phaseLengthInput}
+                                    value={follicularLength.toString()}
+                                    onChangeText={(text) => setFollicularLength(Number(text))}
+                                    keyboardType="numeric"
+                                    placeholder="Follicular Length"
+                                />
+                            </View>
+                            <View style={styles.phaseLengthContainer}>
+                                <Text style={styles.sectionSubTitle}>Ovulation Phase:</Text>
+                                <TextInput
+                                    style={styles.phaseLengthInput}
+                                    value={ovulationLength.toString()}
+                                    onChangeText={(text) => setOvulationLength(Number(text))}
+                                    keyboardType="numeric"
+                                    placeholder="Ovulation Length"
+                                />
+                            </View>
+                            <View style={styles.phaseLengthContainer}>
+                                <Text style={styles.sectionSubTitle}>Luteal Phase:</Text>
+                                <TextInput
+                                    style={styles.phaseLengthInput}
+                                    value={lutealLength.toString()}
+                                    onChangeText={(text) => setLutealLength(Number(text))}
+                                    keyboardType="numeric"
+                                    placeholder="Luteal Length"
+                                />
+                            </View>
+                        </View>
                     </>
                 ) : (
                     <>
@@ -205,30 +306,37 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
             </View>
             
             {/* Settings Section */}
-            <View style={styles.settingsContainer}>
-                <TouchableOpacity style={styles.settingRow}>
-                    <MoonIcon width={20} height={20} />
-                    <Text style={styles.settingText}>Dark Mode</Text>
-                    <Switch value={darkMode} onValueChange={() => setDarkMode(!darkMode)} />
-                </TouchableOpacity>
+            {isEditing ? (
+                <>
+                {/* Hide this section if in edit mode */}
+                </>
+                
+            ) : (
+                <View style={styles.settingsContainer}>
+                    <TouchableOpacity style={styles.settingRow}>
+                        <MoonIcon width={20} height={20} />
+                        <Text style={styles.settingText}>Dark Mode</Text>
+                        <Switch value={darkMode} onValueChange={() => setDarkMode(!darkMode)} />
+                    </TouchableOpacity>
 
-                <TouchableOpacity style={styles.settingRow}>
-                    <KeyIcon width={20} height={20} />
-                    <Text style={styles.settingText}>Change Password</Text>
-                    <RightArrowIcon width={20} height={20} />
-                </TouchableOpacity>
+                    <TouchableOpacity style={styles.settingRow}>
+                        <KeyIcon width={20} height={20} />
+                        <Text style={styles.settingText}>Change Password</Text>
+                        <RightArrowIcon width={20} height={20} />
+                    </TouchableOpacity>
 
-                <TouchableOpacity style={styles.settingRow}>
-                    <ScrollIcon width={20} height={20} />
-                    <Text style={styles.settingText}>Terms & Conditions</Text>
-                    <RightArrowIcon width={20} height={20} />
-                </TouchableOpacity>
+                    <TouchableOpacity style={styles.settingRow}>
+                        <ScrollIcon width={20} height={20} />
+                        <Text style={styles.settingText}>Terms & Conditions</Text>
+                        <RightArrowIcon width={20} height={20} />
+                    </TouchableOpacity>
 
-                <TouchableOpacity style={styles.settingRow} onPress={handleLogout}>
-                    <LogoutIcon width={20} height={20} />
-                    <Text style={styles.settingText}>Logout</Text>
-                </TouchableOpacity>
-            </View>
+                    <TouchableOpacity style={styles.settingRow} onPress={handleLogout}>
+                        <LogoutIcon width={20} height={20} />
+                        <Text style={styles.settingText}>Logout</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
             </ScrollView>
         </View>
     );
@@ -248,6 +356,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     avatarContainer: {
+        alignItems: 'center',
         position: 'relative',
     },
     avatar: {
@@ -264,6 +373,15 @@ const styles = StyleSheet.create({
         padding: 5,
         borderRadius: 10,
     },
+    editDetailsSection: {
+        marginTop: 15,
+        width: '100%',
+    },
+    editDetailsRow: {
+        flexDirection: 'row',
+        marginTop: 10,
+        alignItems: 'center',
+    },
     name: {
         fontSize: 18,
         fontWeight: 'bold',
@@ -275,13 +393,13 @@ const styles = StyleSheet.create({
         color: 'gray',
     },
     input: {
-        width: '100%',
+        marginLeft: 'auto',
+        width: '85%',
         padding: 6,
         fontSize: 14,
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 8,
-        marginTop: 10,
     },
     editButton: {
         display: 'flex',
@@ -317,6 +435,34 @@ const styles = StyleSheet.create({
         fontSize: 16,
         flex: 1,
         marginLeft: 15,
+    },
+    sectionTitle: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        marginTop: 15,
+        marginBottom: 10,
+        alignSelf: 'flex-start',
+    },
+    sectionSubTitle: {
+        alignSelf: 'center',
+        fontSize: 12,
+    },
+    editPhasesSection: {
+        width: '100%',
+        marginVertical: 10,
+    },
+    phaseLengthContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 10,
+    },
+    phaseLengthInput: {
+        padding: 6,
+        fontSize: 14,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 8,
+        width: '50%',
     },
 });
 
