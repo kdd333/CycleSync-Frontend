@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, RefreshControl } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -38,15 +38,15 @@ const CalendarScreen = () => {
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [isPeriodLogged, setIsPeriodLogged] = useState<Boolean>(false);
   const [loggedDates, setLoggedDates] = useState<{ [key: string]: any}>({});
+  const [currentPhase, setCurrentPhase] = useState<string>('');
+  const [cycleDay, setCycleDay] = useState<string>('');
   const [workoutsByDate, setWorkoutsByDate] = useState<{ [key: string]: any}>({});
-  const cycleData = {
-    currentPhase: 'Menstrual',
-    cycleDay: '3',
-  };
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchWorkoutLogs(); 
     fetchPeriodDates();
+    fetchCycleData();
   }, []);
 
   const fetchWorkoutLogs = async () => {
@@ -90,7 +90,7 @@ const CalendarScreen = () => {
         const data = await response.json();
         const markedDates = data.period_dates.reduce(
           (acc: { [key: string]: { selected: boolean; selectedColor: string } }, date: string) => {
-          acc[date] = { selected: true, selectedColor: '#F17CBB' };
+          acc[date] = { selected: true, selectedColor: '#e64e4e' };
           return acc;
         }, {});
         setLoggedDates(markedDates);
@@ -102,11 +102,35 @@ const CalendarScreen = () => {
     }
   };
 
+  const fetchCycleData = async () => {
+    try {
+      const accessToken = await AsyncStorage.getItem('accessToken');
+      const response = await fetch('http://192.168.1.182:8000/api/cycle-data/', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setCurrentPhase(data.current_phase || ''); // Set current phase
+        setCycleDay(data.cycle_day || ''); // Set cycle day
+      } else {
+        console.log('Failed to fetch cycle data:', response.status, response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching cycle data:', error);
+    }
+  };
+
   const handleLogPeriod = async () => {
     try {
       const accessToken = await AsyncStorage.getItem('accessToken');
+      const method = isPeriodLogged ? 'DELETE' : 'POST';  // Toggle between POST and DELETE
       const response = await fetch('http://192.168.1.182:8000/api/log-period/', {
-        method: 'POST',
+        method,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
@@ -115,12 +139,22 @@ const CalendarScreen = () => {
       });
 
       if (response.ok) {
-        const data = await response.json();
-        setLoggedDates((prev) => ({
-          ...prev,
-          [selectedDate]: { selected: true, selectedColor: '#F17CBB' },
-        }));
-        Alert.alert('Success', data.message);
+        if (method === 'POST') {
+          const data = await response.json();
+          setLoggedDates((prev) => ({
+            ...prev,
+            [selectedDate]: { selected: true, selectedColor: '#e64e4e' },
+          }));
+          Alert.alert('Success', data.message);
+        } else {
+          setLoggedDates((prev) => {
+            const updatedDates = { ...prev };
+            delete updatedDates[selectedDate];
+            return updatedDates;
+          });
+          Alert.alert('Success', 'Period log deleted successfully!');
+        }
+        setIsPeriodLogged(!isPeriodLogged); // Toggle the state
       } else {
         const errorData = await response.json();
         Alert.alert('Error', errorData.error || 'Failed to log period.');
@@ -236,13 +270,28 @@ const CalendarScreen = () => {
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        contentContainerStyle={styles.scrollContainer} 
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={async () => {
+              setRefreshing(true);
+              await fetchWorkoutLogs();
+              await fetchPeriodDates();
+              setRefreshing(false);
+            }}
+          />  
+        }
+      >
+
         {/* Current Phase and Cycle Day */}
         <View style={styles.topContainer}>
-          <Text style={styles.currentPhaseText}>Current Phase: {cycleData.currentPhase}</Text>
+          <Text style={styles.currentPhaseText}>Current Phase: {currentPhase}</Text>
           <View style={styles.pinkCircle}>
             <Text style={styles.pinkCircleText}>Day:</Text>
-            <Text style={styles.pinkCircleText}>{cycleData.cycleDay}</Text>
+            <Text style={styles.pinkCircleText}>{cycleDay}</Text>
           </View>
         </View>
 

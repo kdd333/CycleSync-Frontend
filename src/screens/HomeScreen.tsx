@@ -43,23 +43,41 @@ interface WorkoutLog {
 };
 
 const HomeScreen = () => {
-    const [currentPhase, setCurrentPhase] = useState<string | null>(null);
-    const [cycleDay, setCycleDay] = useState<number | null>(null);
+    const [currentPhase, setCurrentPhase] = useState<string>('');
+    const [cycleDay, setCycleDay] = useState<string>('');
+    const [isPeriodLogged, setIsPeriodLogged] = useState<boolean>(false);
     const [workoutLog, setWorkoutLog] = useState<WorkoutLog | null>(null);
     const [workoutDetails, setWorkoutDetails] = useState<Workout | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
 
-    // Placeholder data. TODO: replace with backend data
-    const cycleData = {
-        currentPhase: 'Menstrual',
-        cycleDay: '3',
-        isPeriodLogged: false,
-    };
-
     useEffect(() => {
+        fetchCycleData();
         fetchWorkoutLog();
     }, []);
+
+    const fetchCycleData = async () => {
+        try {
+            const accessToken = await AsyncStorage.getItem('accessToken');
+            const response = await fetch('http://192.168.1.182:8000/api/cycle-data/', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setCurrentPhase(data.current_phase || ""); // Set to empty string if no current phase
+                setCycleDay(data.cycle_day || ""); // Set to empty string if no cycle day
+            } else {
+                console.log('Failed to fetch cycle data:', response.status, response.statusText);
+            }
+        } catch (error) {
+            console.error('Error fetching cycle data:', error);
+        }
+    };
 
     const fetchWorkoutLog = async () => {
         try {
@@ -134,16 +152,16 @@ const HomeScreen = () => {
             <View style={styles.cycleSection}>
                 <View style={styles.textRow}> 
                     <Text style={styles.sectionTitle}>Current Phase:</Text>
-                    <Text style={styles.sectionSubtitle}>{cycleData.currentPhase}</Text>
+                    <Text style={styles.sectionSubtitle}>{currentPhase}</Text>
                 </View>
                 <View style={styles.textRow}>
                     <Text style={styles.sectionTitle}>Cycle Day:</Text>
-                    <Text style={styles.sectionSubtitle}>{cycleData.cycleDay}</Text>
+                    <Text style={styles.sectionSubtitle}>{cycleDay}</Text>
                 </View>
 
                 {/* Cycle Phase Message Section */}
                 <View style={styles.cycleMessageSection}>
-                    {cycleData.isPeriodLogged ? (
+                    {isPeriodLogged ? (
                         // TODO: if period logged, check current phase and display appropriate message.
                         <Text style={styles.cycleMessageText}>Period Logged</Text>
                     ) : (
