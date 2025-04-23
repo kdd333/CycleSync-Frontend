@@ -10,6 +10,7 @@ import ChevronLeftIcon from '../assets/icons/chevronleft.svg';
 import DottedCircleIcon from '../assets/icons/dottedcircle.svg';
 import EditIcon from '../assets/icons/edit.svg';
 import Button from '../components/Button';
+import CircularTimer from '../components/CircularTimer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type DayType = {
@@ -24,7 +25,7 @@ const calendarTheme = {
   calendarBackground: '#fff',
   dayTextColor: '#333',
   todayTextColor: '#fff',
-  todayBackgroundColor: '#999999a1',
+  todayBackgroundColor: '#e64e9251',
   selectedDayBackgroundColor: '#F17CBB',
   selectedDayTextColor: '#fff',
   arrowColor: '#fff',
@@ -90,7 +91,7 @@ const CalendarScreen = () => {
         const data = await response.json();
         const markedDates = data.period_dates.reduce(
           (acc: { [key: string]: { selected: boolean; selectedColor: string } }, date: string) => {
-          acc[date] = { selected: true, selectedColor: '#e64e4e' };
+          acc[date] = { selected: true, selectedColor: '#e808088c' };
           return acc;
         }, {});
         setLoggedDates(markedDates);
@@ -143,7 +144,7 @@ const CalendarScreen = () => {
           const data = await response.json();
           setLoggedDates((prev) => ({
             ...prev,
-            [selectedDate]: { selected: true, selectedColor: '#e64e4e' },
+            [selectedDate]: { selected: true, selectedColor: '#e808088c' },
           }));
           Alert.alert('Success', data.message);
         } else {
@@ -243,6 +244,14 @@ const CalendarScreen = () => {
     );
   };
 
+  // Handle Refresh Function
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchWorkoutLogs();
+    await fetchPeriodDates();
+    await fetchCycleData();
+    setRefreshing(false);
+  };
 
   // Helper function to format date string to DD/MM/YYYY
   const formatDate = (dateString: string) => {
@@ -257,7 +266,13 @@ const CalendarScreen = () => {
   const getDayOfWeek = (dateString: string) => {
     const date = new Date(dateString);
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    return days[date.getDay()];
+    const today = new Date();
+    
+    if (date.toDateString() === today.toDateString()) {
+      return 'Today';
+    } else {
+      return days[date.getDay()];
+    }
   };
 
   // Mark the selected date on the calendar
@@ -274,25 +289,17 @@ const CalendarScreen = () => {
         contentContainerStyle={styles.scrollContainer} 
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={async () => {
-              setRefreshing(true);
-              await fetchWorkoutLogs();
-              await fetchPeriodDates();
-              setRefreshing(false);
-            }}
-          />  
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />  
         }
       >
-
         {/* Current Phase and Cycle Day */}
         <View style={styles.topContainer}>
           <Text style={styles.currentPhaseText}>Current Phase: {currentPhase}</Text>
-          <View style={styles.pinkCircle}>
+          <CircularTimer cycleDay={parseInt(cycleDay) || 0} cycleLength={28} />
+          {/* <View style={styles.pinkCircle}>
             <Text style={styles.pinkCircleText}>Day:</Text>
             <Text style={styles.pinkCircleText}>{cycleDay}</Text>
-          </View>
+          </View> */}
         </View>
 
         <View style={styles.mainContainer}>

@@ -26,6 +26,7 @@ interface WorkoutExercise {
     sets: number;
     reps: number;
     weight: number;
+    warning: string;
 };
 
 interface Workout {
@@ -45,7 +46,7 @@ interface WorkoutLog {
 const HomeScreen = () => {
     const [currentPhase, setCurrentPhase] = useState<string>('');
     const [cycleDay, setCycleDay] = useState<string>('');
-    const [isPeriodLogged, setIsPeriodLogged] = useState<boolean>(false);
+    const [dailyMessage, setDailyMessage] = useState<string>('');
     const [workoutLog, setWorkoutLog] = useState<WorkoutLog | null>(null);
     const [workoutDetails, setWorkoutDetails] = useState<Workout | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -56,7 +57,7 @@ const HomeScreen = () => {
         fetchWorkoutLog();
     }, []);
 
-    const fetchCycleData = async () => {
+    const fetchCycleData = async () => { 
         try {
             const accessToken = await AsyncStorage.getItem('accessToken');
             const response = await fetch('http://192.168.1.182:8000/api/cycle-data/', {
@@ -69,8 +70,10 @@ const HomeScreen = () => {
 
             if (response.ok) {
                 const data = await response.json();
-                setCurrentPhase(data.current_phase || ""); // Set to empty string if no current phase
-                setCycleDay(data.cycle_day || ""); // Set to empty string if no cycle day
+                setCurrentPhase(data.current_phase || ""); 
+                setCycleDay(data.cycle_day || "");
+                setDailyMessage(data.daily_message || "");
+
             } else {
                 console.log('Failed to fetch cycle data:', response.status, response.statusText);
             }
@@ -136,6 +139,7 @@ const HomeScreen = () => {
     const handleRefresh = async () => {
         setRefreshing(true);
         await fetchWorkoutLog();
+        await fetchCycleData();
         setRefreshing(false);
     };
 
@@ -148,25 +152,26 @@ const HomeScreen = () => {
                     <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
                 }
             >
-            {/* Cycle Phase Overview Section */}
-            <View style={styles.cycleSection}>
-                <View style={styles.textRow}> 
-                    <Text style={styles.sectionTitle}>Current Phase:</Text>
-                    <Text style={styles.sectionSubtitle}>{currentPhase}</Text>
-                </View>
-                <View style={styles.textRow}>
-                    <Text style={styles.sectionTitle}>Cycle Day:</Text>
-                    <Text style={styles.sectionSubtitle}>{cycleDay}</Text>
+            <View>
+                {/* Cycle Phase Overview Section */}
+                <View>
+                    <View style={styles.textRow}> 
+                        <Text style={styles.sectionTitle}>Current Phase:</Text>
+                        <View style={styles.badge}>
+                            <Text style={styles.badgeText}>{currentPhase}</Text>
+                        </View>
+                    </View>
+                    <View style={styles.textRow}>
+                        <Text style={styles.sectionTitle}>Cycle Day:</Text>
+                        <View style={styles.badge}>
+                            <Text style={styles.badgeText}>{cycleDay}</Text>
+                        </View>
+                    </View>
                 </View>
 
                 {/* Cycle Phase Message Section */}
                 <View style={styles.cycleMessageSection}>
-                    {isPeriodLogged ? (
-                        // TODO: if period logged, check current phase and display appropriate message.
-                        <Text style={styles.cycleMessageText}>Period Logged</Text>
-                    ) : (
-                        <Text style={styles.cycleMessageText}>Period Not Logged. Log your last period in the calendar section to enable cycle tracking.</Text>
-                    )}
+                    <Text style={styles.cycleMessageText}>{dailyMessage}</Text>    
                 </View>
 
                 {/* Divider */}
@@ -178,7 +183,7 @@ const HomeScreen = () => {
                         {workoutDetails ? (
                             <>
                                 <Text style={styles.sectionTitle}>Today's Workout:</Text>
-                                <Text style={styles.sectionTitle}>{workoutDetails.name}</Text>
+                                <Text style={styles.sectionSubtitle}>{workoutDetails.name}</Text>
                             </>
                         ) : (
                             <Text style={styles.sectionTitle}>Today's Workout:</Text>
@@ -198,6 +203,12 @@ const HomeScreen = () => {
                                         <Text style={styles.exerciseText}>Sets: {exercise.sets}</Text>
                                         <Text style={styles.exerciseText}>Reps: {exercise.reps}</Text>
                                     </View>
+                                    {exercise.warning ? (
+                                        <View style={styles.warningContainer}>
+                                            <IconComponent Icon={warningcircle} color="rgba(255, 6, 6, 0.31)" size={20} />
+                                            <Text style={styles.warningText}>{exercise.warning}</Text>
+                                        </View>
+                                    ) : null}
                                 </View>
                             ))}
                         </>
@@ -224,13 +235,23 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         backgroundColor: '#fff',
     },
-    cycleSection: {
-        marginBottom: 20,
-    },
     textRow: {
         flexDirection: 'row', 
         alignItems: 'center', 
         marginBottom: 10, 
+    },
+    badge: {
+        backgroundColor: '#EFF0F1', // Pink background for the badge
+        paddingVertical: 6,
+        paddingHorizontal: 10,
+        borderRadius: 15,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginLeft: 5, 
+    },
+    badgeText: {
+        color: '#000', 
+        fontSize: 14,
     },
     workoutSection: {
         marginTop: 20,
@@ -241,9 +262,9 @@ const styles = StyleSheet.create({
         marginRight: 6,
     },
     sectionSubtitle: {
-        fontSize: 16,
+        fontSize: 18,
         color: '#666',
-        marginTop: 2,
+        marginTop: 0,
     },
     cycleMessageSection: {
         marginTop: 10,

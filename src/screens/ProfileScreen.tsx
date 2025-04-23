@@ -72,9 +72,9 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
 
     const onRefresh = async () => {
         // Handle pull-to-refresh
-        setRefreshing(true); // Show the refresh indicator
-        await fetchUserDetails(); // Fetch the latest user details
-        setRefreshing(false); // Hide the refresh indicator
+        setRefreshing(true); 
+        await fetchUserDetails(); 
+        setRefreshing(false); 
     };
 
     const handleSaveDetails = async () => {
@@ -116,36 +116,6 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
         } catch (error) {
             console.error('Error updating user details:', error);
             Alert.alert('Error', 'An error occurred while updating user details. Please try again later.');
-        }
-    };
-
-    const handleSavePhaseLengths = async () => {
-        try {
-            const accessToken = await AsyncStorage.getItem('accessToken'); 
-            const response = await fetch('http://192.168.182:8000/api/user/', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`, 
-                },
-                body: JSON.stringify({
-                    menstrual_length: menstrualLength,
-                    follicular_length: follicularLength,
-                    ovulation_length: ovulationLength,
-                    luteal_length: lutealLength,
-                }),
-            });
-
-            if (response.ok) {
-                Alert.alert('Success', 'Phase lengths saved successfully!');
-            } else {
-                console.log('Failed to save phase lengths:', response.status, response.statusText);
-                Alert.alert('Error', 'Failed to save phase lengths. Please try again later.');
-            }
-
-        } catch (error) {
-            console.error('Error saving phase lengths:', error);
-            Alert.alert('Error', 'An error occurred while saving phase lengths. Please try again later.');
         }
     };
 
