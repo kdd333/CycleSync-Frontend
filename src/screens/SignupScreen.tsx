@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import Button from '../components/Button';
+
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 
@@ -13,8 +14,14 @@ const SignupScreen = ({ navigation }: SignupScreenProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isChecked, setIsChecked] = useState(false); 
 
   const handleSignUp = async () => {
+    if (!isChecked) {
+      Alert.alert('You must accept the terms and conditions to proceed.');
+      return;
+    }
+
     console.log('Signing up with:', name, email, password);
     if (password !== confirmPassword) {
       Alert.alert("Passwords don't match!");
@@ -87,11 +94,28 @@ const SignupScreen = ({ navigation }: SignupScreenProps) => {
         secureTextEntry
       />
 
-      <Button title="Sign Up" onPress={handleSignUp} />
+      {/* Checkbox for Terms and Conditions */}
+      <View style={styles.checkboxContainer}>
+        <TouchableOpacity
+          style={[styles.checkbox, isChecked && styles.checkboxChecked]}
+          onPress={() => setIsChecked(!isChecked)}
+        >
+          {isChecked && <Text style={styles.checkmark}>&#10003;</Text>}
+        </TouchableOpacity>
+        <Text style={styles.checkboxLabel}>
+          I agree to the{' '}
+          <Text
+            style={styles.link}
+            onPress={() => navigation.navigate('TermsAndConditions')}
+          >
+            Terms and Conditions
+          </Text>
+        </Text>
+      </View>
 
-      <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-        <Text style={styles.link}>Already have an account? Login</Text>
-      </TouchableOpacity>
+      {/* Sign Up Button and Login Link*/}
+      <Button title="Sign Up" onPress={handleSignUp} />
+      <Text style={styles.linkLabel}>Already have an account?<Text style={styles.link} onPress={() => navigation.navigate('Login')}> Login</Text></Text>
     </View>
   );
 };
@@ -117,6 +141,36 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         padding: 10,
         marginBottom: 15,
+      },
+      checkboxContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 15,
+      },
+      checkmark: {
+        color: '#fff',
+        textAlign: 'center',
+      },
+      checkbox: {
+        width: 20,
+        height: 20,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 4,
+        backgroundColor: '#fff',
+      },
+      checkboxChecked: {
+        backgroundColor: '#F17CBB',
+        borderColor: '#F17CBB',
+      },
+      checkboxLabel: {
+        fontSize: 14,
+        color: '#555',
+        marginLeft: 8,
+      },
+      linkLabel: {
+        marginTop: 15,
+        textAlign: 'center',
       },
       link: {
         color: '#007BFF',

@@ -295,7 +295,10 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
                         <RightArrowIcon width={20} height={20} />
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.settingRow}>
+                    <TouchableOpacity 
+                        style={styles.settingRow}
+                        onPress={() => navigation.navigate('TermsAndConditions')}
+                    >
                         <ScrollIcon width={20} height={20} />
                         <Text style={styles.settingText}>Terms & Conditions</Text>
                         <RightArrowIcon width={20} height={20} />

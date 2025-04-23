@@ -6,6 +6,7 @@ import WorkoutCreationScreen from '../screens/WorkoutCreationScreen';
 import ExerciseSelectionScreen from '../screens/ExerciseSelectionScreen';
 import WorkoutDetailsScreen from '../screens/WorkoutDetailsScreen';
 import WorkoutSelectionScreen from '../screens/WorkoutSelectionScreen';
+import TermsAndConditionsScreen from '../screens/TermsAndConditionsScreen';
 
 type ExerciseType = {
   id: string;
@@ -20,6 +21,7 @@ export type RootStackParamList = {
   ExerciseSelection: { onSelectExercise: (exercise: { id: string; name: string; exercise_type: ExerciseType}) => void };
   WorkoutDetails: { workoutId: number };
   WorkoutSelection: { selectedDate: string, onSelectWorkout: (workoutId: number, workoutName: string) => void };
+  TermsAndConditions: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -37,6 +39,7 @@ const AppNavigator = () => {
       <Stack.Screen name="ExerciseSelection" component={ExerciseSelectionScreen} />
       <Stack.Screen name="WorkoutDetails" component={WorkoutDetailsScreen} />
       <Stack.Screen name="WorkoutSelection" component={WorkoutSelectionScreen} />
+      <Stack.Screen name="TermsAndConditions" component={TermsAndConditionsScreen} />
       
     </Stack.Navigator>
   );

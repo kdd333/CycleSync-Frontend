@@ -67,11 +67,9 @@ const LoginScreen = ({ navigation }: LoginScreenProps) => {
         secureTextEntry
       />
 
+      {/* Login Button and SignUp Link */}
       <Button title="Login" onPress={handleLogin} />
-
-      <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-        <Text style={styles.link}>Don't have an account? Sign Up</Text>
-      </TouchableOpacity>
+      <Text style={styles.linkLabel}>Don't have an account?<Text style={styles.link} onPress={() => navigation.navigate('SignUp')}> Sign Up</Text></Text>
     </View>
   );
 };
@@ -96,6 +94,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 10,
     marginBottom: 15,
+  },
+  linkLabel: {
+    marginTop: 15,
+    textAlign: 'center',
   },
   link: {
     color: '#007BFF',
