@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native
 import { SvgProps } from 'react-native-svg';
 import emojisleep from '../assets/icons/emojisleep.svg';
 import warningcircle from '../assets/icons/warningcircle.svg';
+import CycleOverviewContainer from '../components/CycleOverviewContainer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const IconComponent = ({ Icon, color, size, style }: { Icon: React.FC<SvgProps>, color: string, size?: number, style?: object }) => (
@@ -44,20 +45,19 @@ interface WorkoutLog {
 };
 
 const HomeScreen = () => {
-    const [currentPhase, setCurrentPhase] = useState<string>('');
-    const [cycleDay, setCycleDay] = useState<string>('');
     const [dailyMessage, setDailyMessage] = useState<string>('');
     const [workoutLog, setWorkoutLog] = useState<WorkoutLog | null>(null);
     const [workoutDetails, setWorkoutDetails] = useState<Workout | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+    const [refreshTrigger, setRefreshTrigger] = useState(false);
 
     useEffect(() => {
-        fetchCycleData();
+        fetchDailyCycleMessage();
         fetchWorkoutLog();
     }, []);
 
-    const fetchCycleData = async () => { 
+    const fetchDailyCycleMessage = async () => { 
         try {
             const accessToken = await AsyncStorage.getItem('accessToken');
             const response = await fetch('http://192.168.1.182:8000/api/cycle-data/', {
@@ -70,8 +70,6 @@ const HomeScreen = () => {
 
             if (response.ok) {
                 const data = await response.json();
-                setCurrentPhase(data.current_phase || ""); 
-                setCycleDay(data.cycle_day || "");
                 setDailyMessage(data.daily_message || "");
 
             } else {
@@ -139,7 +137,8 @@ const HomeScreen = () => {
     const handleRefresh = async () => {
         setRefreshing(true);
         await fetchWorkoutLog();
-        await fetchCycleData();
+        await fetchDailyCycleMessage();
+        setRefreshTrigger((prev) => (!prev)); // Trigger re-render of CycleOverviewContainer
         setRefreshing(false);
     };
 
@@ -154,20 +153,7 @@ const HomeScreen = () => {
             >
             <View>
                 {/* Cycle Phase Overview Section */}
-                <View>
-                    <View style={styles.textRow}> 
-                        <Text style={styles.sectionTitle}>Current Phase:</Text>
-                        <View style={styles.badge}>
-                            <Text style={styles.badgeText}>{currentPhase}</Text>
-                        </View>
-                    </View>
-                    <View style={styles.textRow}>
-                        <Text style={styles.sectionTitle}>Cycle Day:</Text>
-                        <View style={styles.badge}>
-                            <Text style={styles.badgeText}>{cycleDay}</Text>
-                        </View>
-                    </View>
-                </View>
+                <CycleOverviewContainer refreshTrigger={refreshTrigger} />
 
                 {/* Cycle Phase Message Section */}
                 <View style={styles.cycleMessageSection}>
@@ -183,10 +169,12 @@ const HomeScreen = () => {
                         {workoutDetails ? (
                             <>
                                 <Text style={styles.sectionTitle}>Today's Workout:</Text>
-                                <Text style={styles.sectionSubtitle}>{workoutDetails.name}</Text>
+                                <Text style={styles.workoutTitle}>{workoutDetails.name}</Text>
                             </>
                         ) : (
-                            <Text style={styles.sectionTitle}>Today's Workout:</Text>
+                            <View>
+                                <Text style={styles.sectionTitle}>Today's Workout:</Text>
+                            </View>
                         )}
 
                     </View>
@@ -240,21 +228,15 @@ const styles = StyleSheet.create({
         alignItems: 'center', 
         marginBottom: 10, 
     },
-    badge: {
-        backgroundColor: '#EFF0F1', // Pink background for the badge
-        paddingVertical: 6,
-        paddingHorizontal: 10,
-        borderRadius: 15,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginLeft: 5, 
-    },
-    badgeText: {
-        color: '#000', 
-        fontSize: 14,
-    },
     workoutSection: {
         marginTop: 20,
+    },
+    workoutTitle: {
+        fontSize: 16,
+        backgroundColor: '#F4F4F5',
+        padding: 10,
+        borderRadius: 10,
+        marginLeft: 5,
     },
     sectionTitle: {
         fontSize: 18,
@@ -262,9 +244,7 @@ const styles = StyleSheet.create({
         marginRight: 6,
     },
     sectionSubtitle: {
-        fontSize: 18,
-        color: '#666',
-        marginTop: 0,
+        fontSize: 15,
     },
     cycleMessageSection: {
         marginTop: 10,
@@ -286,12 +266,12 @@ const styles = StyleSheet.create({
     exerciseContainer: {
         marginVertical: 10,
         padding: 15,
-        backgroundColor: '#EFF0F1',
+        backgroundColor: '#F4F4F5',
         borderRadius: 15,
     },
     exerciseName: {
-        fontSize: 16,
-        fontWeight: 'bold',
+        fontSize: 15,
+        fontWeight: 600,
         marginBottom: 12,
     },
     exerciseDetails: {

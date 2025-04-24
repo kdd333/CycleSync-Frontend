@@ -7,10 +7,9 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import SleepEmojiIcon from '../assets/icons/emojisleep.svg';
 import ChevronRightIcon from '../assets/icons/chevronright.svg';
 import ChevronLeftIcon from '../assets/icons/chevronleft.svg';
-import DottedCircleIcon from '../assets/icons/dottedcircle.svg';
 import EditIcon from '../assets/icons/edit.svg';
 import Button from '../components/Button';
-import CircularTimer from '../components/CircularTimer';
+import CycleOverviewContainer from '../components/CycleOverviewContainer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type DayType = {
@@ -39,15 +38,13 @@ const CalendarScreen = () => {
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [isPeriodLogged, setIsPeriodLogged] = useState<Boolean>(false);
   const [loggedDates, setLoggedDates] = useState<{ [key: string]: any}>({});
-  const [currentPhase, setCurrentPhase] = useState<string>('');
-  const [cycleDay, setCycleDay] = useState<string>('');
   const [workoutsByDate, setWorkoutsByDate] = useState<{ [key: string]: any}>({});
   const [refreshing, setRefreshing] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(false);
 
   useEffect(() => {
     fetchWorkoutLogs(); 
     fetchPeriodDates();
-    fetchCycleData();
   }, []);
 
   const fetchWorkoutLogs = async () => {
@@ -100,29 +97,6 @@ const CalendarScreen = () => {
       }
     } catch (error) {
       console.error('Error fetching period dates:', error);
-    }
-  };
-
-  const fetchCycleData = async () => {
-    try {
-      const accessToken = await AsyncStorage.getItem('accessToken');
-      const response = await fetch('http://192.168.1.182:8000/api/cycle-data/', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setCurrentPhase(data.current_phase || ''); // Set current phase
-        setCycleDay(data.cycle_day || ''); // Set cycle day
-      } else {
-        console.log('Failed to fetch cycle data:', response.status, response.statusText);
-      }
-    } catch (error) {
-      console.error('Error fetching cycle data:', error);
     }
   };
 
@@ -249,7 +223,7 @@ const CalendarScreen = () => {
     setRefreshing(true);
     await fetchWorkoutLogs();
     await fetchPeriodDates();
-    await fetchCycleData();
+    setRefreshTrigger((prev) => !prev); // Trigger a refresh for components that depend on this state
     setRefreshing(false);
   };
 
@@ -293,14 +267,7 @@ const CalendarScreen = () => {
         }
       >
         {/* Current Phase and Cycle Day */}
-        <View style={styles.topContainer}>
-          <Text style={styles.currentPhaseText}>Current Phase: {currentPhase}</Text>
-          <CircularTimer cycleDay={parseInt(cycleDay) || 0} cycleLength={28} />
-          {/* <View style={styles.pinkCircle}>
-            <Text style={styles.pinkCircleText}>Day:</Text>
-            <Text style={styles.pinkCircleText}>{cycleDay}</Text>
-          </View> */}
-        </View>
+        <CycleOverviewContainer refreshTrigger={refreshTrigger}/>
 
         <View style={styles.mainContainer}>
           {/* Calendar */}
@@ -383,27 +350,6 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-  },
-  topContainer: {
-    alignItems: 'center',
-  },
-  currentPhaseText: {
-    fontSize: 18,
-    marginBottom: 20,
-  },
-  pinkCircle: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: '#F17CBB',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  pinkCircleText: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginVertical: 2,
   },
   mainContainer: {
     borderWidth: 1,

@@ -273,6 +273,9 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
                     {isEditing ? <RightArrowIcon width={25} height={25} /> : <EditIcon width={20} height={20} />}
                     <Text style={styles.editButtonText}> {isEditing ? "Save Details" : "Edit Details"} </Text>
                 </TouchableOpacity>
+                {isEditing && (
+                    <Text style={styles.link} onPress={() => setIsEditing(false)}>Cancel</Text>
+                )}
             </View>
             
             {/* Settings Section */}
@@ -347,6 +350,11 @@ const styles = StyleSheet.create({
         backgroundColor: '#F17CBB',
         padding: 5,
         borderRadius: 10,
+    },
+    link: {
+        color: '#007BFF',
+        textAlign: 'center',
+        marginTop: 15,
     },
     editDetailsSection: {
         marginTop: 15,
