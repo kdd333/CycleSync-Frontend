@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity, Modal, Pressable } from 'react-native';
 import { SvgProps } from 'react-native-svg';
 import emojisleep from '../assets/icons/emojisleep.svg';
 import warningcircle from '../assets/icons/warningcircle.svg';
@@ -51,11 +51,23 @@ const HomeScreen = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [refreshTrigger, setRefreshTrigger] = useState(false);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [selectedWarning, setSelectedWarning] = useState<string | null>(null);
 
     useEffect(() => {
         fetchDailyCycleMessage();
         fetchWorkoutLog();
     }, []);
+
+    const handleWarningPress = (warning: string) => {
+        setSelectedWarning(warning);    
+        setModalVisible(true);
+    };
+
+    const handleCloseModal = () => {
+        setModalVisible(false);
+        setSelectedWarning(null);
+    };
 
     const fetchDailyCycleMessage = async () => { 
         try {
@@ -185,18 +197,23 @@ const HomeScreen = () => {
                         <>
                             {workoutDetails.workout_exercises.map((exercise, index) => (
                                 <View key={index} style={styles.exerciseContainer}>
-                                    <Text style={styles.exerciseName}>{exercise.exercise.name}</Text>
+                                    <View style={styles.exerciseTitleRow}>
+                                        {exercise.warning ? (
+                                            <>
+                                                <Text style={styles.exerciseName}>{exercise.exercise.name}</Text>
+                                                <TouchableOpacity onPress={() => handleWarningPress(exercise.warning)}>
+                                                    <IconComponent Icon={warningcircle} color="rgba(255, 6, 6, 0)" size={25} />
+                                                </TouchableOpacity>
+                                            </>
+                                        ) : (
+                                            <Text style={styles.exerciseName}>{exercise.exercise.name}</Text>
+                                        )}
+                                    </View>
                                     <View style={styles.exerciseDetails}>
                                         <Text style={styles.exerciseText}>Weight: {exercise.weight}kg</Text>
                                         <Text style={styles.exerciseText}>Sets: {exercise.sets}</Text>
                                         <Text style={styles.exerciseText}>Reps: {exercise.reps}</Text>
                                     </View>
-                                    {exercise.warning ? (
-                                        <View style={styles.warningContainer}>
-                                            <IconComponent Icon={warningcircle} color="rgba(255, 6, 6, 0.31)" size={20} />
-                                            <Text style={styles.warningText}>{exercise.warning}</Text>
-                                        </View>
-                                    ) : null}
                                 </View>
                             ))}
                         </>
@@ -209,6 +226,24 @@ const HomeScreen = () => {
                 </View>
             </View>
             </ScrollView>
+
+            {/* Warning Modal */}
+            <Modal
+                animationType="none"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={handleCloseModal}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTitle}>Warning</Text>
+                        <Text style={styles.modalText}>{selectedWarning}</Text>
+                        <Pressable style={styles.closeButton} onPress={handleCloseModal}>
+                            <Text style={styles.closeButtonText}>Close</Text>
+                        </Pressable>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 };
@@ -257,7 +292,7 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontWeight: 'bold',
         textAlign: 'center',
-      },
+    },
     divider: {
         height: 0.6,
         backgroundColor: '#ddd',
@@ -269,10 +304,15 @@ const styles = StyleSheet.create({
         backgroundColor: '#F4F4F5',
         borderRadius: 15,
     },
+    exerciseTitleRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
     exerciseName: {
         fontSize: 15,
         fontWeight: 600,
-        marginBottom: 12,
     },
     exerciseDetails: {
         flexDirection: 'row',
@@ -317,6 +357,41 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontWeight: 300,
         color: '#660000',
+    },
+    modalOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+        width: '80%',
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        padding: 20,
+        alignItems: 'center',
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+        color: '#F17CBB',
+    },
+    modalText: {
+        fontSize: 14,
+        color: '#333',
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    closeButton: {
+        backgroundColor: '#F17CBB',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 5,
+    },
+    closeButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
     },
 });
 
