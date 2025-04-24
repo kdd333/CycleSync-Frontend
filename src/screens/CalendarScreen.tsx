@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
   mainContainer: {
     borderWidth: 1,
     borderColor: '#ddd',
-    borderRadius: 10,
+    borderRadius: 15,
     marginTop: 20,
   },
   calendarContainer: {

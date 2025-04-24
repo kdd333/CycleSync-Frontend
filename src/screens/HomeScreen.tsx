@@ -166,7 +166,7 @@ const HomeScreen = () => {
             <View>
                 {/* Cycle Phase Overview Section */}
                 <CycleOverviewContainer refreshTrigger={refreshTrigger} />
-
+                
                 {/* Cycle Phase Message Section */}
                 <View style={styles.cycleMessageSection}>
                     <Text style={styles.cycleMessageText}>{dailyMessage}</Text>    

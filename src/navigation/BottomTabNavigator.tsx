@@ -11,6 +11,8 @@ import tracking from '../assets/icons/tracking.svg';
 import trackingfilled from '../assets/icons/trackingfilled.svg';
 import user from '../assets/icons/user.svg';
 import userfilled from '../assets/icons/userfilled.svg';
+import weight from '../assets/icons/weight.svg';
+import weightfilled from '../assets/icons/weightfilled.svg';
 import { SvgProps } from 'react-native-svg';
 import { Alert, Image, StyleSheet, Text } from 'react-native';
 import CycleSyncLight from '../assets/logo/CycleSyncLight.png';
@@ -23,8 +25,23 @@ import { RootStackParamList } from './AppNavigator';
 
 const Tab = createBottomTabNavigator();
 
-const IconComponent = ({ Icon, color, style }: { Icon: React.FC<SvgProps>, color: string, style?: object }) => (
-    <Icon width={28} height={28} fill={color} style={style} />
+const IconComponent = ({
+  Icon,
+  color,
+  style,
+  size = 28, // Default size
+}: {
+  Icon: React.FC<SvgProps>;
+  color: string;
+  style?: object;
+  size?: number; 
+}) => (
+  <Icon
+    width={size} 
+    height={size} 
+    fill={color}
+    style={style}
+  />
 );
 
 const BottomTabNavigator = () => {
@@ -117,14 +134,14 @@ const BottomTabNavigator = () => {
           ),
           headerShadowVisible: false,
           tabBarActiveTintColor: '#fff',
-          tabBarInactiveTintColor: '#F17CBB',
+          tabBarInactiveTintColor: '#fff',
           tabBarStyle: {
               backgroundColor: '#F17CBB',
               paddingVertical: 5,
               paddingTop: 10,
-              height: 75,
+              height: 80,
           },
-          tabBarShowLabel: false, 
+          tabBarShowLabel: true, 
         }}
       >
         <Tab.Screen
@@ -147,8 +164,8 @@ const BottomTabNavigator = () => {
           name="Tracking"
           component={TrackingScreen}
           options={{
-            tabBarLabel: 'Tracking',
-            tabBarIcon: ({ focused }) => <IconComponent Icon={focused ? trackingfilled : tracking} color='#F17CBB' />,
+            tabBarLabel: 'Workouts',
+            tabBarIcon: ({ focused }) => <IconComponent Icon={focused ? weightfilled : weight} color='#F17CBB' size={32} />,
           }}
         />
         <Tab.Screen
