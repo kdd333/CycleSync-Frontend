@@ -289,7 +289,9 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
                         <Switch value={darkMode} onValueChange={() => setDarkMode(!darkMode)} />
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.settingRow}>
+                    <TouchableOpacity style={styles.settingRow}
+                        onPress={() => navigation.navigate('ChangePassword')}
+                    >
                         <KeyIcon width={20} height={20} />
                         <Text style={styles.settingText}>Change Password</Text>
                         <RightArrowIcon width={20} height={20} />
