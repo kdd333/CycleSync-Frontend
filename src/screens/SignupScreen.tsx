@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import Button from '../components/Button';
-
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import { API_BASE_URL } from '../config';
 
 type SignupScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, 'SignUp'>;
@@ -29,7 +29,7 @@ const SignupScreen = ({ navigation }: SignupScreenProps) => {
     }
 
     try {
-      const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/signup/', {
+      const response = await fetch(`${API_BASE_URL}/api/signup/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

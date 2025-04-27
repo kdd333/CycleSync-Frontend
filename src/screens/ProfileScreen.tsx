@@ -9,6 +9,7 @@ import RightArrowIcon from '../assets/icons/rightarrow.svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigator'; 
+import { API_BASE_URL } from '../config';
 
 type ProfileScreenProps = {
     navigation: StackNavigationProp<RootStackParamList, 'Main'>;
@@ -23,7 +24,6 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
     const [follicularLength, setFollicularLength] = useState<number>(10);
     const [ovulationLength, setOvulationLength] = useState<number>(1);
     const [lutealLength, setLutealLength] = useState<number>(12);
-    const [isEditingLengths, setIsEditingLengths] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
 
     useEffect(() => { 
@@ -41,7 +41,7 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
                 return;
             }
 
-            const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/user/', {
+            const response = await fetch(`${API_BASE_URL}/api/user/`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -85,7 +85,7 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
                 return;
             }
 
-            const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/user/', {
+            const response = await fetch(`${API_BASE_URL}/api/user/`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -126,7 +126,7 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
 
             if (refreshToken) {
                 // call backend logout API to blacklist the refresh token
-                const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/logout/', {
+                const response = await fetch(`${API_BASE_URL}/api/logout/`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

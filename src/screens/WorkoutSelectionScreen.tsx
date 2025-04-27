@@ -6,6 +6,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import ArrowLeftIcon from '../assets/icons/arrowleft.svg';
 import TickIcon from '../assets/icons/tick.svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_BASE_URL } from '../config'; 
 
 type WorkoutSelectionScreenNavigationProp = StackNavigationProp<RootStackParamList, 'WorkoutSelection'>;
 type WorkoutSelectionScreenRouteProp = RouteProp<RootStackParamList, 'WorkoutSelection'>;
@@ -50,7 +51,7 @@ const WorkoutSelectionScreen = () => {
     const fetchWorkouts = async () => {
         const accessToken = await AsyncStorage.getItem('accessToken');
         try {
-            const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/workouts/', {
+            const response = await fetch(`${API_BASE_URL}/api/workouts/`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

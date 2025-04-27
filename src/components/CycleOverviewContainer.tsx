@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import CircularTimer from './CircularTimer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_BASE_URL } from '../config';
 
 type CycleOverviewContainerProps = {
     refreshTrigger: boolean;
@@ -19,7 +20,7 @@ const CycleOverviewContainer: React.FC<CycleOverviewContainerProps> = ({refreshT
     const fetchCycleData = async () => {
         try {
             const accessToken = await AsyncStorage.getItem('accessToken');
-            const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/cycle-data/', {
+            const response = await fetch(`${API_BASE_URL}/api/cycle-data/`, {
                 method: 'GET',
                 headers: {
                 'Content-Type': 'application/json',

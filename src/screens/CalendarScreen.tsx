@@ -11,6 +11,7 @@ import EditIcon from '../assets/icons/edit.svg';
 import Button from '../components/Button';
 import CycleOverviewContainer from '../components/CycleOverviewContainer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_BASE_URL } from '../config';
 
 type DayType = {
   dateString: string;
@@ -50,7 +51,7 @@ const CalendarScreen = () => {
   const fetchWorkoutLogs = async () => {
     try {
       const accessToken = await AsyncStorage.getItem('accessToken');
-      const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/workout-logs/', {
+      const response = await fetch(`${API_BASE_URL}/api/workout-logs/`, {
           method: 'GET',
           headers: {
               'Content-Type': 'application/json',
@@ -76,7 +77,7 @@ const CalendarScreen = () => {
   const fetchPeriodDates = async () => {
     try {
       const accessToken = await AsyncStorage.getItem('accessToken');
-      const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/period-dates/', {
+      const response = await fetch(`${API_BASE_URL}/api/period-dates/`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -104,7 +105,7 @@ const CalendarScreen = () => {
     try {
       const accessToken = await AsyncStorage.getItem('accessToken');
       const method = isPeriodLogged ? 'DELETE' : 'POST';  // Toggle between POST and DELETE
-      const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/log-period/', {
+      const response = await fetch(`${API_BASE_URL}/api/log-period/`, {
         method,
         headers: {
           'Content-Type': 'application/json',
@@ -147,7 +148,7 @@ const CalendarScreen = () => {
       onSelectWorkout: async (workoutId: number, workoutName: string) => {
         try {
           const accessToken = await AsyncStorage.getItem('accessToken');
-          const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/workout-logs/', {
+          const response = await fetch(`${API_BASE_URL}/api/workout-logs/`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -177,7 +178,7 @@ const CalendarScreen = () => {
   const handleDeleteWorkoutLog = async () => {
     try {
       const accessToken = await AsyncStorage.getItem('accessToken');
-      const response = await fetch(`https://cyclesync-backend-production.up.railway.app/api/workout-logs/`, {
+      const response = await fetch(`${API_BASE_URL}/api/workout-logs/`, {
           method: 'DELETE',
           headers: {
               'Content-Type': 'application/json',

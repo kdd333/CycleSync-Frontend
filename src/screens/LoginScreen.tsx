@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import Button from '../components/Button';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../navigation/AppNavigator'; // Define this in AppNavigator.tsx
+import { RootStackParamList } from '../navigation/AppNavigator'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_BASE_URL } from '../config'; 
 
 type LoginScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, 'Login'>;
@@ -17,7 +18,7 @@ const LoginScreen = ({ navigation }: LoginScreenProps) => {
     console.log('Logging in with:', email, password);
 
     try {
-      const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/login/', {
+      const response = await fetch(`${API_BASE_URL}/api/login/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

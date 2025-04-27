@@ -7,6 +7,7 @@ import AddCircleIcon from '../assets/icons/addcircle.svg';
 import ChevronRightIcon from '../assets/icons/chevronright.svg';
 import EmojiSleepIcon from '../assets/icons/emojisleep.svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_BASE_URL } from '../config'; 
 
 type TrackingScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Main'>;
 
@@ -28,7 +29,7 @@ const TrackingScreen: React.FC = () => {
   const fetchWorkouts = async () => {
     try {
       const accessToken = await AsyncStorage.getItem('accessToken');
-      const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/workouts/', {
+      const response = await fetch(`${API_BASE_URL}/api/workouts/`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -53,7 +54,7 @@ const TrackingScreen: React.FC = () => {
   const deleteWorkout = async (workoutId: number) => {
     try {
       const accessToken = await AsyncStorage.getItem('accessToken');
-      const response = await fetch(`https://cyclesync-backend-production.up.railway.app/api/workouts/${workoutId}/`, {
+      const response = await fetch(`${API_BASE_URL}/api/workouts/${workoutId}/`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

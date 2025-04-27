@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Button from '../components/Button';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import { API_BASE_URL } from '../config';
 
 type ChangePasswordScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, 'ChangePassword'>;
@@ -37,7 +38,7 @@ const ChangePasswordScreen = ({ navigation }: ChangePasswordScreenProps) => {
         return;
       }
 
-      const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/change-password/', {
+      const response = await fetch(`${API_BASE_URL}/api/change-password/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

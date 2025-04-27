@@ -7,8 +7,6 @@ import home from '../assets/icons/home.svg';
 import homefilled from '../assets/icons/homefilled.svg';
 import calendar from '../assets/icons/calendar.svg';
 import calendarfilled from '../assets/icons/calendarfilled.svg';
-import tracking from '../assets/icons/tracking.svg';
-import trackingfilled from '../assets/icons/trackingfilled.svg';
 import user from '../assets/icons/user.svg';
 import userfilled from '../assets/icons/userfilled.svg';
 import weight from '../assets/icons/weight.svg';
@@ -21,6 +19,7 @@ import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-m
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from './AppNavigator';
+import { API_BASE_URL } from '../config';
 
 const Tab = createBottomTabNavigator();
 
@@ -53,7 +52,7 @@ const BottomTabNavigator = () => {
       
       if (refreshToken) {
         // call backend logout API to blacklist the refresh token
-        const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/logout/', {
+        const response = await fetch(`${API_BASE_URL}/api/logout/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

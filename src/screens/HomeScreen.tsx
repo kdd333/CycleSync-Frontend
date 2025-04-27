@@ -5,6 +5,7 @@ import emojisleep from '../assets/icons/emojisleep.svg';
 import warningcircle from '../assets/icons/warningcircle.svg';
 import CycleOverviewContainer from '../components/CycleOverviewContainer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_BASE_URL } from '../config';
 
 const IconComponent = ({ Icon, color, size, style }: { Icon: React.FC<SvgProps>, color: string, size?: number, style?: object }) => (
     <Icon width={size} height={size} fill={color} style={style} />
@@ -72,7 +73,7 @@ const HomeScreen = () => {
     const fetchDailyCycleMessage = async () => { 
         try {
             const accessToken = await AsyncStorage.getItem('accessToken');
-            const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/cycle-data/', {
+            const response = await fetch(`${API_BASE_URL}/api/cycle-data/`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -97,7 +98,7 @@ const HomeScreen = () => {
             const accessToken = await AsyncStorage.getItem('accessToken');
             const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
 
-            const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/workout-logs/', {
+            const response = await fetch(`${API_BASE_URL}/api/workout-logs/`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -127,7 +128,7 @@ const HomeScreen = () => {
     const fetchWorkoutDetails = async (workoutId: number) => {
         try {
             const accessToken = await AsyncStorage.getItem('accessToken');
-            const response = await fetch(`https://cyclesync-backend-production.up.railway.app/api/workouts/${workoutId}/`, {
+            const response = await fetch(`${API_BASE_URL}/api/workouts/${workoutId}/`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

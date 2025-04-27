@@ -8,6 +8,7 @@ import TickIcon from '../assets/icons/tick.svg';
 import SearchIcon from '../assets/icons/search.svg';
 import Button from '../components/Button';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_BASE_URL } from '../config';
 
 type ExerciseSelectionScreenNavigationProp = StackNavigationProp<RootStackParamList, 'ExerciseSelection'>;
 type ExerciseSelectionScreenRouteProp = RouteProp<RootStackParamList, 'ExerciseSelection'>;
@@ -25,30 +26,30 @@ const ExerciseSelectionScreen = () => {
   const [exercisesList, setExercisesList] = useState<{ id: string; name: string; exercise_type: ExerciseType }[]>([]);
 
   useEffect(() => {
-    const fetchExercises = async () => {
-      try {
-        const accessToken = await AsyncStorage.getItem('accessToken');
-        const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/exercises/', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setExercisesList(data); // Assuming the API returns an array of exercise names
-        } else {
-          console.log('Failed to fetch exercises:', response.status, response.statusText);
-        }
-      } catch (error) {
-        console.error('Error fetching exercises:', error);
-      }
-    };
-
     fetchExercises();
   }, []);
+
+  const fetchExercises = async () => {
+    try {
+      const accessToken = await AsyncStorage.getItem('accessToken');
+      const response = await fetch(`${API_BASE_URL}/api/exercises/`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setExercisesList(data); // Assuming the API returns an array of exercise names
+      } else {
+        console.log('Failed to fetch exercises:', response.status, response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching exercises:', error);
+    }
+  };
 
   // Filtered exercises based on search
   const filteredExercises = exercisesList.filter((exercise) =>
