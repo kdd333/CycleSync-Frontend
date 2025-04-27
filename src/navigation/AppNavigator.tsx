@@ -37,7 +37,7 @@ const AppNavigator = () => {
       screenOptions={{ headerShown: false }}
     >
       <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="SignUp" component={SignupScreen} />
+      {/* <Stack.Screen name="SignUp" component={SignupScreen} />
       <Stack.Screen name="Main" component={BottomTabNavigator} />
       <Stack.Screen name="WorkoutCreation" component={WorkoutCreationScreen} />
       <Stack.Screen name="ExerciseSelection" component={ExerciseSelectionScreen} />
@@ -45,7 +45,7 @@ const AppNavigator = () => {
       <Stack.Screen name="WorkoutSelection" component={WorkoutSelectionScreen} />
       <Stack.Screen name="TermsAndConditions" component={TermsAndConditionsScreen} />
       <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
-      <Stack.Screen name="Help" component={HelpScreen} />
+      <Stack.Screen name="Help" component={HelpScreen} /> */}
       
     </Stack.Navigator>
   );
