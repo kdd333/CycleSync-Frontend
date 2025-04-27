@@ -1,4 +1,9 @@
 {
   "name": "CyclesyncApp",
-  "displayName": "CyclesyncApp"
+  "displayName": "CyclesyncApp",
+  "extra": {
+    "eas": {
+      "projectId": "efcd0b61-acd9-48a6-b8cd-6c3a3807affb"
+    }
+  }
 }
