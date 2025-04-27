@@ -37,7 +37,7 @@ const ChangePasswordScreen = ({ navigation }: ChangePasswordScreenProps) => {
         return;
       }
 
-      const response = await fetch('http://192.168.1.182:8000/api/change-password/', {
+      const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/change-password/', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

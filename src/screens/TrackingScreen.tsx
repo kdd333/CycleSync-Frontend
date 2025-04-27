@@ -20,8 +20,6 @@ const TrackingScreen: React.FC = () => {
   const navigation = useNavigation<TrackingScreenNavigationProp>();
   const [ workoutList, setWorkoutList ] = useState<Workout[]>([]);
   const [ refreshing, setRefreshing ] = useState(false);
-  const [ modalVisible, setModalVisible ] = useState(false);
-  const [ selectedWorkoutId, setSelectedWorkoutId ] = useState<number | null>(null);
 
   useEffect(() => {
     fetchWorkouts();
@@ -30,7 +28,7 @@ const TrackingScreen: React.FC = () => {
   const fetchWorkouts = async () => {
     try {
       const accessToken = await AsyncStorage.getItem('accessToken');
-      const response = await fetch('http://192.168.1.182:8000/api/workouts/', {
+      const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/workouts/', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -55,7 +53,7 @@ const TrackingScreen: React.FC = () => {
   const deleteWorkout = async (workoutId: number) => {
     try {
       const accessToken = await AsyncStorage.getItem('accessToken');
-      const response = await fetch(`http://192.168.1.182:8000/api/workouts/${workoutId}/`, {
+      const response = await fetch(`https://cyclesync-backend-production.up.railway.app/api/workouts/${workoutId}/`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

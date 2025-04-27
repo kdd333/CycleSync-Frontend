@@ -28,7 +28,7 @@ const ExerciseSelectionScreen = () => {
     const fetchExercises = async () => {
       try {
         const accessToken = await AsyncStorage.getItem('accessToken');
-        const response = await fetch('http://192.168.1.182:8000/api/exercises/', {
+        const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/exercises/', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

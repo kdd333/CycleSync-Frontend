@@ -7,7 +7,6 @@ import EditIcon from '../assets/icons/edit.svg';
 import ArrowLeftIcon from '../assets/icons/arrowleft.svg';
 import Button from '../components/Button';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { parse } from 'react-native-svg';
 
 type WorkoutDetailsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'WorkoutDetails'>;
 type WorkoutDetailsScreenRouteProp = RouteProp<RootStackParamList, 'WorkoutDetails'>;
@@ -38,7 +37,7 @@ const WorkoutDetailsScreen = () => {
         // Fetch workout details from the backend using the workout id
         try {
             const accessToken = await AsyncStorage.getItem('accessToken');
-            const response = await fetch(`http://192.168.1.182:8000/api/workouts/${workoutId}/`,{
+            const response = await fetch(`https://cyclesync-backend-production.up.railway.app/api/workouts/${workoutId}/`,{
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -143,7 +142,7 @@ const WorkoutDetailsScreen = () => {
         // PUT request to Save the workout to the backend:
         try {
             const accessToken = await AsyncStorage.getItem('accessToken');
-            const response = await fetch(`http://192.168.1.182:8000/api/workouts/${workoutId}/`, {
+            const response = await fetch(`https://cyclesync-backend-production.up.railway.app/api/workouts/${workoutId}/`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

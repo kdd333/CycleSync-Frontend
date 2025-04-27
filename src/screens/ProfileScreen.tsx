@@ -6,9 +6,7 @@ import KeyIcon from '../assets/icons/key.svg';
 import MoonIcon from '../assets/icons/moon.svg';
 import ScrollIcon from '../assets/icons/scroll.svg';
 import RightArrowIcon from '../assets/icons/rightarrow.svg';
-import Button from '../components/Button';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigator'; 
 
@@ -43,7 +41,7 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
                 return;
             }
 
-            const response = await fetch('http://192.168.1.182:8000/api/user/', {
+            const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/user/', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -87,7 +85,7 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
                 return;
             }
 
-            const response = await fetch('http://192.168.1.182:8000/api/user/', {
+            const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/user/', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -128,7 +126,7 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
 
             if (refreshToken) {
                 // call backend logout API to blacklist the refresh token
-                const response = await fetch('http://192.168.1.182:8000/api/logout/', {
+                const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/logout/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

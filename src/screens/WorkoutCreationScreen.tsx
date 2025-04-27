@@ -79,7 +79,7 @@ const WorkoutCreationScreen = () => {
 
         try {
             const accessToken = await AsyncStorage.getItem('accessToken');
-            const response = await fetch('http://192.168.1.182:8000/api/workouts/', {
+            const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/workouts/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

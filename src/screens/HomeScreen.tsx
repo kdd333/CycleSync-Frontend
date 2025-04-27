@@ -72,7 +72,7 @@ const HomeScreen = () => {
     const fetchDailyCycleMessage = async () => { 
         try {
             const accessToken = await AsyncStorage.getItem('accessToken');
-            const response = await fetch('http://192.168.1.182:8000/api/cycle-data/', {
+            const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/cycle-data/', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -97,7 +97,7 @@ const HomeScreen = () => {
             const accessToken = await AsyncStorage.getItem('accessToken');
             const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
 
-            const response = await fetch('http://192.168.1.182:8000/api/workout-logs/', {
+            const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/workout-logs/', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -127,7 +127,7 @@ const HomeScreen = () => {
     const fetchWorkoutDetails = async (workoutId: number) => {
         try {
             const accessToken = await AsyncStorage.getItem('accessToken');
-            const response = await fetch(`http://192.168.1.182:8000/api/workouts/${workoutId}/`, {
+            const response = await fetch(`https://cyclesync-backend-production.up.railway.app/api/workouts/${workoutId}/`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

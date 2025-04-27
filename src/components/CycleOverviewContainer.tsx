@@ -19,7 +19,7 @@ const CycleOverviewContainer: React.FC<CycleOverviewContainerProps> = ({refreshT
     const fetchCycleData = async () => {
         try {
             const accessToken = await AsyncStorage.getItem('accessToken');
-            const response = await fetch('http://192.168.1.182:8000/api/cycle-data/', {
+            const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/cycle-data/', {
                 method: 'GET',
                 headers: {
                 'Content-Type': 'application/json',

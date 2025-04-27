@@ -17,7 +17,6 @@ import { SvgProps } from 'react-native-svg';
 import { Alert, Image, StyleSheet, Text } from 'react-native';
 import CycleSyncLight from '../assets/logo/CycleSyncLight.png';
 import dotshorizontal from '../assets/icons/dotshorizontal.svg';
-import { TouchableOpacity } from 'react-native';
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
@@ -54,7 +53,7 @@ const BottomTabNavigator = () => {
       
       if (refreshToken) {
         // call backend logout API to blacklist the refresh token
-        const response = await fetch('http://192.168.1.182:8000/api/logout/', {
+        const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/logout/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

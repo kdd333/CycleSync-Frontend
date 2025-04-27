@@ -29,7 +29,7 @@ const SignupScreen = ({ navigation }: SignupScreenProps) => {
     }
 
     try {
-      const response = await fetch('http://192.168.1.182:8000/api/signup/', {
+      const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/signup/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

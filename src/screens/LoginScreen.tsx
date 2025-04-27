@@ -17,7 +17,7 @@ const LoginScreen = ({ navigation }: LoginScreenProps) => {
     console.log('Logging in with:', email, password);
 
     try {
-      const response = await fetch('http://192.168.1.182:8000/api/login/', {
+      const response = await fetch('https://cyclesync-backend-production.up.railway.app/api/login/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
