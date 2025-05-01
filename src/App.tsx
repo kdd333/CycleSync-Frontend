@@ -7,12 +7,12 @@ import { MenuProvider } from 'react-native-popup-menu';
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 
-// const fetchFonts = async () => {
-//   await Font.loadAsync({
-//     'LobsterTwo-Regular': require('./assets/fonts/LobsterTwo-Regular.ttf'),
-//     'LobsterTwo-Bold': require('./assets/fonts/LobsterTwo-Bold.ttf'),
-//   });
-// };
+const fetchFonts = async () => {
+  await Font.loadAsync({
+    'LobsterTwo-Regular': require('./assets/fonts/LobsterTwo-Regular.ttf'),
+    'LobsterTwo-Bold': require('./assets/fonts/LobsterTwo-Bold.ttf'),
+  });
+};
 
 const App = () => {
   const [fontLoaded, setFontLoaded] = useState(false);
@@ -24,7 +24,7 @@ const App = () => {
         await SplashScreen.preventAutoHideAsync();
 
         // Load fonts
-        //await fetchFonts();
+        await fetchFonts();
       } catch (error) {
         console.error('Error loading fonts:', error);
       } finally {

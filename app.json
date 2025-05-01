@@ -4,6 +4,7 @@
     "slug": "cyclesyncapp",
     "version": "1.0.0",
     "runtimeVersion": "1.0.0",
+    "userInterfaceStyle": "light",
     "orientation": "portrait",
     "platforms": ["ios", "android"],
     "updates": {
