@@ -1,15 +1,26 @@
 {
-  "name": "CyclesyncApp",
-  "displayName": "CyclesyncApp",
-  "extra": {
-    "eas": {
-      "projectId": "efcd0b61-acd9-48a6-b8cd-6c3a3807affb"
+  "expo": {
+    "name": "CyclesyncApp",
+    "slug": "cyclesyncapp",
+    "version": "1.0.0",
+    "runtimeVersion": "1.0.0",
+    "orientation": "portrait",
+    "platforms": ["ios", "android"],
+    "updates": {
+      "url": "https://u.expo.dev/efcd0b61-acd9-48a6-b8cd-6c3a3807affb"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "efcd0b61-acd9-48a6-b8cd-6c3a3807affb"
+      }
+    },
+    "android": {
+      "package": "com.kdd333.cyclesyncapp",
+      "versionCode": 1
+    },
+    "ios": {
+      "bundleIdentifier": "com.kdd333.cyclesyncapp",
+      "buildNumber": "1.0.0"
     }
-  },
-  "runtimeVersion": "1.0.0",
-  "updates": {
-    "url": "https://u.expo.dev/efcd0b61-acd9-48a6-b8cd-6c3a3807affb"
-  },
-  "android": {},
-  "ios": {}
+  }
 }

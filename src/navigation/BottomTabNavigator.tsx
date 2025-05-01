@@ -97,10 +97,10 @@ const BottomTabNavigator = () => {
               shadowOpacity: 0,
           },
           headerLeft: () => (
-              <Image 
-                  source={CycleSyncLight} 
-                  style={{ width: 150, height: 50, marginLeft: 20, resizeMode: 'contain' }} 
-              />
+            <Text style={{ fontFamily: 'LobsterTwo-Regular', fontSize: 40, color: '#000', marginLeft: 20 }}>
+              <Text style={{ color: '#F17CBB' }}>C</Text>ycle
+              <Text style={{ color: '#F17CBB' }}>S</Text>ync
+            </Text> 
           ),
           headerRight: () => (
             <Menu>

@@ -30,8 +30,8 @@ const calendarTheme = {
   selectedDayTextColor: '#fff',
   arrowColor: '#fff',
   monthTextColor: '#000',
-  textMonthFontWeight: 'bold',
-  textDayHeaderFontWeight: 'bold',
+  textMonthFontWeight: 'bold' as 'bold',
+  textDayHeaderFontWeight: 'bold' as 'bold',
 };
 
 const CalendarScreen = () => {
