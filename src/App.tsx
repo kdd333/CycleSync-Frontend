@@ -1,36 +1,44 @@
-// App.tsx
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import 'react-native-url-polyfill/auto';
 import { NavigationContainer } from '@react-navigation/native';
 import AppNavigator from '../src/navigation/AppNavigator';
 import { WorkoutProvider } from '../src/context/WorkoutContext';
-import { Menu, MenuProvider } from 'react-native-popup-menu';
+import { MenuProvider } from 'react-native-popup-menu';
 import * as Font from 'expo-font';
-import AppLoading from 'expo-app-loading';
+import * as SplashScreen from 'expo-splash-screen';
 
-const fetchFonts = async () => {
-  try {
-    await Font.loadAsync({
-      'LobsterTwo-Regular': require('./assets/fonts/LobsterTwo-Regular.ttf'),
-      'LobsterTwo-Bold': require('./assets/fonts/LobsterTwo-Bold.ttf'),
-    });
-  } catch (error) {
-    console.error('Error loading fonts:', error);
-  }
-};
-
+// const fetchFonts = async () => {
+//   await Font.loadAsync({
+//     'LobsterTwo-Regular': require('./assets/fonts/LobsterTwo-Regular.ttf'),
+//     'LobsterTwo-Bold': require('./assets/fonts/LobsterTwo-Bold.ttf'),
+//   });
+// };
 
 const App = () => {
-  const [fontLoaded, setFontLoaded] = React.useState(false);
+  const [fontLoaded, setFontLoaded] = useState(false);
+
+  useEffect(() => {
+    const prepareApp = async () => {
+      try {
+        // Prevent the splash screen from auto-hiding
+        await SplashScreen.preventAutoHideAsync();
+
+        // Load fonts
+        //await fetchFonts();
+      } catch (error) {
+        console.error('Error loading fonts:', error);
+      } finally {
+        setFontLoaded(true);
+        // Hide the splash screen once fonts are loaded
+        await SplashScreen.hideAsync();
+      }
+    };
+
+    prepareApp();
+  }, []);
 
   if (!fontLoaded) {
-    return (
-      <AppLoading
-        startAsync={fetchFonts}
-        onFinish={() => setFontLoaded(true)}
-        onError={(err) => console.log(err)}
-      />
-    );
+    return null; // Keep the splash screen visible
   }
 
   return (
