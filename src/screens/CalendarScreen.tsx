@@ -105,12 +105,15 @@ const CalendarScreen = () => {
     try {
       const accessToken = await AsyncStorage.getItem('accessToken');
       const method = isPeriodLogged ? 'DELETE' : 'POST';  // Toggle between POST and DELETE
-      const response = await fetch(`${API_BASE_URL}/api/log-period/${selectedDate}/`, {
+      const response = await fetch(`${API_BASE_URL}/api/log-period/`, {
         method,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
         },
+        body: JSON.stringify({
+          date: selectedDate,
+        }),
       });
 
       if (response.ok) {
