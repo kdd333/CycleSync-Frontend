@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import Button from '../components/Button';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
@@ -15,6 +15,7 @@ const SignupScreen = ({ navigation }: SignupScreenProps) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isChecked, setIsChecked] = useState(false); 
+  const [loading, setLoading] = useState(false);
 
   const handleSignUp = async () => {
     if (!isChecked) {
@@ -29,6 +30,7 @@ const SignupScreen = ({ navigation }: SignupScreenProps) => {
     }
 
     try {
+      setLoading(true); 
       const response = await fetch(`${API_BASE_URL}/api/signup/`, {
         method: 'POST',
         headers: {
@@ -55,6 +57,8 @@ const SignupScreen = ({ navigation }: SignupScreenProps) => {
     } catch (error) {
       console.error('Signup error:', error);
       Alert.alert('Signup Failed', 'An error occurred while trying to sign up. Please try again.');
+    } finally {
+      setLoading(false); 
     }
   };
 
@@ -114,7 +118,11 @@ const SignupScreen = ({ navigation }: SignupScreenProps) => {
       </View>
 
       {/* Sign Up Button and Login Link*/}
-      <Button title="Sign Up" onPress={handleSignUp} />
+      {loading ? (
+        <ActivityIndicator size="large" color="#F17CBB" style={styles.loadingIndicator} />
+      ) : (
+        <Button title="Sign Up" onPress={handleSignUp} />
+      )}
       <Text style={styles.linkLabel}>Already have an account?<Text style={styles.link} onPress={() => navigation.navigate('Login')}> Login</Text></Text>
     </View>
   );
@@ -122,61 +130,64 @@ const SignupScreen = ({ navigation }: SignupScreenProps) => {
 
 // Reuse the same styles as LoginScreen
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        padding: 20,
-        backgroundColor: '#fff',
-      },
-      title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        marginBottom: 30,
-        textAlign: 'center',
-      },
-      input: {
-        height: 50,
-        borderColor: '#ddd',
-        borderWidth: 1,
-        borderRadius: 8,
-        padding: 10,
-        marginBottom: 15,
-      },
-      checkboxContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 15,
-      },
-      checkmark: {
-        color: '#fff',
-        textAlign: 'center',
-      },
-      checkbox: {
-        width: 20,
-        height: 20,
-        borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 4,
-        backgroundColor: '#fff',
-      },
-      checkboxChecked: {
-        backgroundColor: '#F17CBB',
-        borderColor: '#F17CBB',
-      },
-      checkboxLabel: {
-        fontSize: 14,
-        color: '#555',
-        marginLeft: 8,
-      },
-      linkLabel: {
-        marginTop: 15,
-        textAlign: 'center',
-      },
-      link: {
-        color: '#007BFF',
-        textAlign: 'center',
-        marginTop: 15,
-      },
+  container: {
+      flex: 1,
+      justifyContent: 'center',
+      padding: 20,
+      backgroundColor: '#fff',
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: 'bold',
+      marginBottom: 30,
+      textAlign: 'center',
+    },
+    input: {
+      height: 50,
+      borderColor: '#ddd',
+      borderWidth: 1,
+      borderRadius: 8,
+      padding: 10,
+      marginBottom: 15,
+    },
+    checkboxContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 15,
+    },
+    checkmark: {
+      color: '#fff',
+      textAlign: 'center',
+    },
+    checkbox: {
+      width: 20,
+      height: 20,
+      borderWidth: 1,
+      borderColor: '#ddd',
+      borderRadius: 4,
+      backgroundColor: '#fff',
+    },
+    checkboxChecked: {
+      backgroundColor: '#F17CBB',
+      borderColor: '#F17CBB',
+    },
+    checkboxLabel: {
+      fontSize: 14,
+      color: '#555',
+      marginLeft: 8,
+    },
+    linkLabel: {
+      marginTop: 15,
+      textAlign: 'center',
+    },
+    link: {
+      color: '#007BFF',
+      textAlign: 'center',
+      marginTop: 15,
+    },
+    loadingIndicator: {
+      marginTop: 20,
+    },
 });
 
 export default SignupScreen;

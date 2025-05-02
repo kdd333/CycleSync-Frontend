@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, Text, TextInput, StyleSheet, TouchableOpacity, Switch, Image, Alert, RefreshControl } from 'react-native';
+import { View, ScrollView, Text, TextInput, StyleSheet, TouchableOpacity, Switch, Image, Alert, RefreshControl, ActivityIndicator } from 'react-native';
 import EditIcon from '../assets/icons/edit.svg'; 
 import LogoutIcon from '../assets/icons/logout.svg';
 import KeyIcon from '../assets/icons/key.svg';
@@ -25,6 +25,7 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
     const [ovulationLength, setOvulationLength] = useState<number>(1);
     const [lutealLength, setLutealLength] = useState<number>(12);
     const [refreshing, setRefreshing] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => { 
         fetchUserDetails();
@@ -33,7 +34,7 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
     const fetchUserDetails = async () => {
         // Fetch user details from the backend API
         try {
-
+            setLoading(true); 
             const accessToken = await AsyncStorage.getItem('accessToken'); // Get the access token from AsyncStorage
             if (!accessToken) {
                 console.log('No access token found');
@@ -65,6 +66,8 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
         } catch (error) {
             console.error('Error fetching user details:', error);
             Alert.alert('Error', 'Failed to fetch user details. Please try again later.');
+        } finally {
+            setLoading(false); 
         }
     };
 
@@ -251,12 +254,23 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
                         </View>
                     </>
                 ) : (
-                    <>
-                        <Text style={styles.name}>{name}</Text>
-                        <Text style={styles.email}>{email}</Text>
+                    <>  
+                        {loading ? (
+                            <View style={styles.loadingContainer}>
+                                <ActivityIndicator size="large" color="#F17CBB" />
+                            </View>
+                        ) : (
+                            <>
+                                <Text style={styles.name}>{name}</Text>
+                                <Text style={styles.email}>{email}</Text>
+                            </>
+                        )}
                     </>
                 )}
 
+                {loading ? (
+                    <></>
+                ) : (
                 <TouchableOpacity 
                     style={styles.editButton} 
                     onPress={() => {
@@ -271,6 +285,7 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
                     {isEditing ? <RightArrowIcon width={25} height={25} /> : <EditIcon width={20} height={20} />}
                     <Text style={styles.editButtonText}> {isEditing ? "Save Details" : "Edit Details"} </Text>
                 </TouchableOpacity>
+                )}
                 {isEditing && (
                     <Text style={styles.link} onPress={() => setIsEditing(false)}>Cancel</Text>
                 )}
@@ -444,6 +459,12 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
         borderRadius: 8,
         width: '50%',
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: 150,
     },
 });
 

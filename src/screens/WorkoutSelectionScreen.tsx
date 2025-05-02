@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/AppNavigator';
@@ -43,12 +43,14 @@ const WorkoutSelectionScreen = () => {
     const { selectedDate, onSelectWorkout } = route.params; // Get the selected date from navigation params
     const [workoutsList, setWorkoutsList] = useState<Workout[]>([]);
     const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
+    const [loading, setLoading] = useState(true); 
 
     useEffect(() => {
         fetchWorkouts(); 
     }, []);
 
     const fetchWorkouts = async () => {
+        setLoading(true); 
         const accessToken = await AsyncStorage.getItem('accessToken');
         try {
             const response = await fetch(`${API_BASE_URL}/api/workouts/`, {
@@ -68,6 +70,8 @@ const WorkoutSelectionScreen = () => {
 
         } catch (error) {
             console.error('Error fetching workouts:', error);
+        } finally {
+            setLoading(false); 
         }
     };
 
@@ -88,37 +92,46 @@ const WorkoutSelectionScreen = () => {
                     <ArrowLeftIcon width={30} height={30} />
                 </TouchableOpacity>
             </View>
-            {/* List of Workouts */}
-            <FlatList
-                data={workoutsList}
-                keyExtractor={(item) => item.id.toString()}
-                contentContainerStyle={styles.listContainer}
-                renderItem={({ item }) => (
-                <TouchableOpacity
-                    style={styles.workoutItem}
-                    onPress={() => setSelectedWorkout(item)}
-                >
-                    <Text style={[styles.workoutText, selectedWorkout?.id === item.id && styles.selectedText]}>
-                    {item.name}
-                    </Text>
-                    {selectedWorkout?.id === item.id && <TickIcon width={20} height={20} />}
-                </TouchableOpacity>
-                )}
-            />
 
-            {/* Select Button */}
-            <View style={styles.bottomContainer}>
-                <TouchableOpacity
-                    style={[
-                        styles.selectButton,
-                        !selectedWorkout && styles.disabledButton, // Apply disabled style if no workout is selected
-                    ]}
-                    onPress={handleSelectWorkout}
-                    disabled={!selectedWorkout} // Disable the button if no workout is selected
-                >
-                    <Text style={styles.selectButtonText}>Select Workout</Text>
-                </TouchableOpacity>
-            </View>
+            {loading ? (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#F17CBB" />
+                </View>
+            ) : (
+                <>
+                    {/* Workout List */}
+                    <FlatList
+                        data={workoutsList}
+                        keyExtractor={(item) => item.id.toString()}
+                        contentContainerStyle={styles.listContainer}
+                        renderItem={({ item }) => (
+                        <TouchableOpacity
+                            style={styles.workoutItem}
+                            onPress={() => setSelectedWorkout(item)}
+                        >
+                            <Text style={[styles.workoutText, selectedWorkout?.id === item.id && styles.selectedText]}>
+                            {item.name}
+                            </Text>
+                            {selectedWorkout?.id === item.id && <TickIcon width={20} height={20} />}
+                        </TouchableOpacity>
+                        )}
+                    />
+            
+                    {/* Select Workout Button */}   
+                    <View style={styles.bottomContainer}>
+                        <TouchableOpacity
+                            style={[
+                                styles.selectButton,
+                                !selectedWorkout && styles.disabledButton, // Apply disabled style if no workout is selected
+                            ]}
+                            onPress={handleSelectWorkout}
+                            disabled={!selectedWorkout} // Disable the button if no workout is selected
+                        >
+                            <Text style={styles.selectButtonText}>Select Workout</Text>
+                        </TouchableOpacity>
+                    </View>
+                </>
+            )}
         </View>
     );
 };
@@ -173,6 +186,12 @@ const styles = StyleSheet.create({
     bottomContainer: {
         backgroundColor: 'white',
         marginBottom: 10,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: 400,
     },
 });
 

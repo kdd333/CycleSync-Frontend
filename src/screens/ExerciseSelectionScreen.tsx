@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, ActivityIndicator } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -24,6 +24,7 @@ const ExerciseSelectionScreen = () => {
   const [selectedExercise, setSelectedExercise] = useState<{ id: string; name: string; exercise_type: ExerciseType } | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [exercisesList, setExercisesList] = useState<{ id: string; name: string; exercise_type: ExerciseType }[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchExercises();
@@ -31,6 +32,7 @@ const ExerciseSelectionScreen = () => {
 
   const fetchExercises = async () => {
     try {
+      setLoading(true);
       const accessToken = await AsyncStorage.getItem('accessToken');
       const response = await fetch(`${API_BASE_URL}/api/exercises/`, {
         method: 'GET',
@@ -48,6 +50,8 @@ const ExerciseSelectionScreen = () => {
       }
     } catch (error) {
       console.error('Error fetching exercises:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -75,24 +79,30 @@ const ExerciseSelectionScreen = () => {
             </View>
             
         </View>
-
-        {/* List of Exercises */}
-        <FlatList
-            data={filteredExercises}
-            keyExtractor={(item) => item.id}
-            style={styles.exerciseList}
-            renderItem={({ item }) => (
-            <TouchableOpacity
-                onPress={() => setSelectedExercise(item)}
-                style={styles.exerciseItem}
-              >
-                <Text style={[styles.exerciseText, selectedExercise === item && styles.selectedText]}>
-                    {item.name}
-                </Text>
-                {selectedExercise === item && <TickIcon width={20} height={20} />}
-            </TouchableOpacity>
-            )}
-        />
+        {/* Loading Indicator */}
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#F17CBB" />
+          </View>
+        ) : (
+          // List of Exercises 
+          <FlatList
+              data={filteredExercises}
+              keyExtractor={(item) => item.id}
+              style={styles.exerciseList}
+              renderItem={({ item }) => (
+              <TouchableOpacity
+                  onPress={() => setSelectedExercise(item)}
+                  style={styles.exerciseItem}
+                >
+                  <Text style={[styles.exerciseText, selectedExercise === item && styles.selectedText]}>
+                      {item.name}
+                  </Text>
+                  {selectedExercise === item && <TickIcon width={20} height={20} />}
+              </TouchableOpacity>
+              )}
+          />
+        )}
 
         {/* Bottom Container with Add Button */}
       <View style={styles.bottomContainer}>
@@ -156,6 +166,11 @@ const styles = StyleSheet.create({
     },
     bottomContainer: {
         backgroundColor: 'white',
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
 

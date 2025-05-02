@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Button from '../components/Button';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -14,6 +14,7 @@ const ChangePasswordScreen = ({ navigation }: ChangePasswordScreenProps) => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleChangePassword = async () => {
     if (newPassword === currentPassword) {
@@ -32,6 +33,7 @@ const ChangePasswordScreen = ({ navigation }: ChangePasswordScreenProps) => {
     }
 
     try {
+      setLoading(true);
       const accessToken = await AsyncStorage.getItem('accessToken');
       if (!accessToken) {
         Alert.alert("Error", "No access token found. Please log in again.");
@@ -60,6 +62,8 @@ const ChangePasswordScreen = ({ navigation }: ChangePasswordScreenProps) => {
     } catch (error) {
       console.error("Error changing password:", error);
       Alert.alert("Error", "An error occurred while changing the password. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -91,11 +95,17 @@ const ChangePasswordScreen = ({ navigation }: ChangePasswordScreenProps) => {
         secureTextEntry
       />
 
-      <Button title="Change Password" onPress={handleChangePassword} />
-
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Text style={styles.link}>Cancel</Text>
-      </TouchableOpacity>
+      {loading ? (
+        <ActivityIndicator size="large" color="#F17CBB" style={styles.loadingIndicator} />
+      ) : (
+        <>
+          <Button title="Change Password" onPress={handleChangePassword} />
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Text style={styles.link}>Cancel</Text>
+          </TouchableOpacity>
+        </>
+      )}
+      
     </View>
   );
 };
@@ -125,6 +135,9 @@ const styles = StyleSheet.create({
     color: '#007BFF',
     textAlign: 'center',
     marginTop: 15,
+  },
+  loadingIndicator: {
+    marginTop: 20,
   },
 });
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import Button from '../components/Button';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigator'; 
@@ -13,9 +13,11 @@ type LoginScreenProps = {
 const LoginScreen = ({ navigation }: LoginScreenProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false); 
 
   const handleLogin = async () => {
     console.log('Logging in with:', email, password);
+    setLoading(true); 
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/login/`, {
@@ -44,6 +46,8 @@ const LoginScreen = ({ navigation }: LoginScreenProps) => {
     } catch (error) {
       console.error('Login error:', error);
       Alert.alert('Login Failed', 'An error occurred while trying to log in. Please try again.');
+    } finally { 
+      setLoading(false); 
     }
   };
 
@@ -69,7 +73,12 @@ const LoginScreen = ({ navigation }: LoginScreenProps) => {
       />
 
       {/* Login Button and SignUp Link */}
-      <Button title="Login" onPress={handleLogin} />
+      {loading ? (
+
+        <ActivityIndicator size="large" color="#F17CBB" style={styles.loadingIndicator}/>
+      ) : (
+        <Button title="Login" onPress={handleLogin} />
+      )}
       <Text style={styles.linkLabel}>Don't have an account?<Text style={styles.link} onPress={() => navigation.navigate('SignUp')}> Sign Up</Text></Text>
     </View>
   );
@@ -104,6 +113,9 @@ const styles = StyleSheet.create({
     color: '#007BFF',
     textAlign: 'center',
     marginTop: 15,
+  },
+  loadingIndicator: {
+    marginTop: 20,
   },
 });
 

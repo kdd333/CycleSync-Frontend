@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, RefreshControl, Alert, Modal } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, RefreshControl, Alert, ActivityIndicator } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { useNavigation } from '@react-navigation/native';
@@ -21,6 +21,7 @@ const TrackingScreen: React.FC = () => {
   const navigation = useNavigation<TrackingScreenNavigationProp>();
   const [ workoutList, setWorkoutList ] = useState<Workout[]>([]);
   const [ refreshing, setRefreshing ] = useState(false);
+  const [ loading, setLoading ] = useState(true);
 
   useEffect(() => {
     fetchWorkouts();
@@ -28,6 +29,7 @@ const TrackingScreen: React.FC = () => {
 
   const fetchWorkouts = async () => {
     try {
+      setLoading(true); 
       const accessToken = await AsyncStorage.getItem('accessToken');
       const response = await fetch(`${API_BASE_URL}/api/workouts/`, {
         method: 'GET',
@@ -48,6 +50,8 @@ const TrackingScreen: React.FC = () => {
     } catch (error) {
       console.error('Error fetching workouts:', error);
       Alert.alert('Error fetching workouts', 'Please try again later.');
+    } finally {
+      setLoading(false); 
     }
   };
 
@@ -125,32 +129,39 @@ const TrackingScreen: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      {/* List of Workouts */}
-      <FlatList 
-        data={workoutList}
-        keyExtractor={(item: Workout) => item.id.toString()}
-        contentContainerStyle={styles.listContainer}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>
-        }
-        ListEmptyComponent={
-          <View style={styles.emptyListContainer}>
-            <EmojiSleepIcon width={50} height={50} />
-            <Text style={styles.emptyListText}>No workouts created</Text>
-          </View>
-        }
-        renderItem={({ item }) => (
-          <TouchableOpacity 
-            style={styles.workoutItem} 
-            onPress={() => navigation.navigate('WorkoutDetails', { workoutId: item.id })}
-            onLongPress={() => showOptionsAlert(item.id)} 
-          >
-            <Text style={styles.workoutText}>{item.name}</Text>
-            <ChevronRightIcon width={30} height={30} fill="#EFF0F1" />
-          </TouchableOpacity>
-        )}
-      />
+      {/* Loading Indicator */}
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#F17CBB" />
+        </View>
+      ) : (
+        // List of Workouts
+        <FlatList 
+          data={workoutList}
+          keyExtractor={(item: Workout) => item.id.toString()}
+          contentContainerStyle={styles.listContainer}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>
+          }
+          ListEmptyComponent={
+            <View style={styles.emptyListContainer}>
+              <EmojiSleepIcon width={50} height={50} />
+              <Text style={styles.emptyListText}>No workouts created</Text>
+            </View>
+          }
+          renderItem={({ item }) => (
+            <TouchableOpacity 
+              style={styles.workoutItem} 
+              onPress={() => navigation.navigate('WorkoutDetails', { workoutId: item.id })}
+              onLongPress={() => showOptionsAlert(item.id)} 
+            >
+              <Text style={styles.workoutText}>{item.name}</Text>
+              <ChevronRightIcon width={30} height={30} fill="#EFF0F1" />
+            </TouchableOpacity>
+          )}
+        />
+      )}
     </View>
   );
 };
@@ -210,6 +221,12 @@ const styles = StyleSheet.create({
   workoutText: {
     fontSize: 18,
     padding: 10,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 400,
   },
 });
 

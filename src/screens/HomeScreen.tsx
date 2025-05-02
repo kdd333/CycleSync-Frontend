@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity, Modal, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity, Modal, Pressable, ActivityIndicator } from 'react-native';
 import { SvgProps } from 'react-native-svg';
 import emojisleep from '../assets/icons/emojisleep.svg';
 import warningcircle from '../assets/icons/warningcircle.svg';
@@ -112,7 +112,7 @@ const HomeScreen = () => {
 
                 if (todayLog) {
                     setWorkoutLog(todayLog);
-                    fetchWorkoutDetails(todayLog.workout);
+                    await fetchWorkoutDetails(todayLog.workout);
                 } else {
                     setWorkoutLog(null);
                     setWorkoutDetails(null);
@@ -144,7 +144,7 @@ const HomeScreen = () => {
             }
         } catch (error) {
             console.error('Error fetching workout details:', error);
-        }
+        } 
     };
 
     const handleRefresh = async () => {
@@ -193,7 +193,9 @@ const HomeScreen = () => {
                     </View>
 
                     {isLoading ? (
-                        <Text>Loading...</Text>
+                        <View style={styles.loadingContainer}>
+                            <ActivityIndicator size="large" color="#F17CBB"  />     
+                        </View>                       
                     ) : workoutDetails ? (
                         <>
                             {workoutDetails.workout_exercises.map((exercise, index) => (
@@ -393,6 +395,12 @@ const styles = StyleSheet.create({
     closeButtonText: {
         color: '#fff',
         fontWeight: 'bold',
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: 200,
     },
 });
 

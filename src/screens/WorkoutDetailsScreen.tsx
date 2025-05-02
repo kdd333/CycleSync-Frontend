@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, TextInput, Text, TouchableOpacity, ScrollView, StyleSheet, Alert } from 'react-native';
+import { View, TextInput, Text, TouchableOpacity, ScrollView, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation, RouteProp, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/AppNavigator';
@@ -29,6 +29,7 @@ const WorkoutDetailsScreen = () => {
     const { workoutId } = route.params;
     const [workoutName, setWorkoutName] = useState('');
     const [workoutExercises, setWorkoutExercises] = useState<{ id: string; exercise: Exercise; weight: string; sets: string; reps: string }[]>([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         fetchWorkoutDetails();
@@ -37,6 +38,7 @@ const WorkoutDetailsScreen = () => {
     const fetchWorkoutDetails = async () => {
         // Fetch workout details from the backend using the workout id
         try {
+            setLoading(true);
             const accessToken = await AsyncStorage.getItem('accessToken');
             const response = await fetch(`${API_BASE_URL}/api/workouts/${workoutId}/`,{
                 method: 'GET',
@@ -66,6 +68,8 @@ const WorkoutDetailsScreen = () => {
             }
         } catch (error) {
             console.error('Error fetching workout details:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -182,75 +186,81 @@ const WorkoutDetailsScreen = () => {
             </View>
             
             {/* Scrollable Section (Workout Name & Exercises) */}
-            <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
-                {/* Workout Name Input */}
-                <View style={styles.workoutNameContainer}>
-                    <Text style={styles.nameLabel}>Name:</Text>
-                    <TextInput
-                        style={styles.nameInput}
-                        value={workoutName}
-                        onChangeText={setWorkoutName}
-                        placeholder="Enter workout name"
-                    />
+            {loading ? (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#F17CBB" />
                 </View>
-
-                {/* List of Exercises */}
-                {workoutExercises.map((workoutExercise, index) => (
-                    <View key={index} style={styles.exerciseContainer}>
-                        <View style={styles.exerciseContainerTop}>
-                            <Text style={styles.exerciseName}>{workoutExercise.exercise.name}</Text>
-                            <TouchableOpacity style={styles.editExerciseButton} onPress={() => handleEditExercise(index)}>
-                                <EditIcon width={20} height={20} />
-                            </TouchableOpacity>
-                        </View>
-
-                        <View style={styles.exerciseRowContainer}>
-                            <Text style={styles.label}>Weight (Kg):</Text>
-                            <TextInput
-                                keyboardType="numeric"
-                                style={styles.input}
-                                value={workoutExercise.weight}
-                                onChangeText={(text) => {
-                                const updatedExercises = [...workoutExercises];
-                                updatedExercises[index].weight = text;
-                                setWorkoutExercises(updatedExercises);
-                                }}
-                                placeholder="Enter weight"
-                            />
-                        </View>
-
-                        <View style={styles.exerciseRowContainer}>
-                            <Text style={styles.label}>Sets:</Text>
-                            <TextInput
-                                keyboardType="numeric"
-                                style={styles.input}
-                                value={workoutExercise.sets}
-                                onChangeText={(text) => {
-                                const updatedExercises = [...workoutExercises];
-                                updatedExercises[index].sets = text;
-                                setWorkoutExercises(updatedExercises);
-                                }}
-                                placeholder="Enter sets"
-                            />
-                        </View>
-
-                        <View style={styles.exerciseRowContainer}>
-                            <Text style={styles.label}>Reps:</Text>
-                            <TextInput
-                                keyboardType="numeric"
-                                style={styles.input}
-                                value={workoutExercise.reps}
-                                onChangeText={(text) => {
-                                const updatedExercises = [...workoutExercises];
-                                updatedExercises[index].reps = text;
-                                setWorkoutExercises(updatedExercises);
-                                }}
-                                placeholder="Enter reps"
-                            />
-                        </View>
+            ) : (            
+                <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+                    {/* Workout Name Input */}
+                    <View style={styles.workoutNameContainer}>
+                        <Text style={styles.nameLabel}>Name:</Text>
+                        <TextInput
+                            style={styles.nameInput}
+                            value={workoutName}
+                            onChangeText={setWorkoutName}
+                            placeholder="Enter workout name"
+                        />
                     </View>
-                ))}
-            </ScrollView>
+
+                    {/* List of Exercises */}
+                    {workoutExercises.map((workoutExercise, index) => (
+                        <View key={index} style={styles.exerciseContainer}>
+                            <View style={styles.exerciseContainerTop}>
+                                <Text style={styles.exerciseName}>{workoutExercise.exercise.name}</Text>
+                                <TouchableOpacity style={styles.editExerciseButton} onPress={() => handleEditExercise(index)}>
+                                    <EditIcon width={20} height={20} />
+                                </TouchableOpacity>
+                            </View>
+
+                            <View style={styles.exerciseRowContainer}>
+                                <Text style={styles.label}>Weight (Kg):</Text>
+                                <TextInput
+                                    keyboardType="numeric"
+                                    style={styles.input}
+                                    value={workoutExercise.weight}
+                                    onChangeText={(text) => {
+                                    const updatedExercises = [...workoutExercises];
+                                    updatedExercises[index].weight = text;
+                                    setWorkoutExercises(updatedExercises);
+                                    }}
+                                    placeholder="Enter weight"
+                                />
+                            </View>
+
+                            <View style={styles.exerciseRowContainer}>
+                                <Text style={styles.label}>Sets:</Text>
+                                <TextInput
+                                    keyboardType="numeric"
+                                    style={styles.input}
+                                    value={workoutExercise.sets}
+                                    onChangeText={(text) => {
+                                    const updatedExercises = [...workoutExercises];
+                                    updatedExercises[index].sets = text;
+                                    setWorkoutExercises(updatedExercises);
+                                    }}
+                                    placeholder="Enter sets"
+                                />
+                            </View>
+
+                            <View style={styles.exerciseRowContainer}>
+                                <Text style={styles.label}>Reps:</Text>
+                                <TextInput
+                                    keyboardType="numeric"
+                                    style={styles.input}
+                                    value={workoutExercise.reps}
+                                    onChangeText={(text) => {
+                                    const updatedExercises = [...workoutExercises];
+                                    updatedExercises[index].reps = text;
+                                    setWorkoutExercises(updatedExercises);
+                                    }}
+                                    placeholder="Enter reps"
+                                />
+                            </View>
+                        </View>
+                    ))}
+                </ScrollView>
+            )}
 
             {/* Add Exercise Button */}
             <View style={styles.bottomContainer}>
@@ -348,6 +358,12 @@ const styles = StyleSheet.create({
         left: 20,
         right: 20,
         backgroundColor: '#fff',
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: 400,
     },
 });
 
