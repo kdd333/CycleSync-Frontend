@@ -104,9 +104,8 @@ const CalendarScreen = () => {
   const handleLogPeriod = async () => {
     try {
       const accessToken = await AsyncStorage.getItem('accessToken');
-      const method = isPeriodLogged ? 'DELETE' : 'POST';  // Toggle between POST and DELETE
       const response = await fetch(`${API_BASE_URL}/api/log-period/${selectedDate}/`, {
-        method,
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
@@ -114,22 +113,13 @@ const CalendarScreen = () => {
       });
 
       if (response.ok) {
-        if (method === 'POST') {
-          const data = await response.json();
-          setLoggedDates((prev) => ({
-            ...prev,
-            [selectedDate]: { selected: true, selectedColor: '#e808088c' },
-          }));
-          Alert.alert('Success', data.message);
-        } else {
-          setLoggedDates((prev) => {
-            const updatedDates = { ...prev };
-            delete updatedDates[selectedDate];
-            return updatedDates;
-          });
-          Alert.alert('Success', 'Period log deleted successfully!');
-        }
-        setIsPeriodLogged(!isPeriodLogged); // Toggle the state
+        const data = await response.json();
+        setLoggedDates((prev) => ({
+          ...prev,
+          [selectedDate]: { selected: true, selectedColor: '#e808088c' },
+        }));
+        setIsPeriodLogged(true); 
+        Alert.alert('Success', data.message);
       } else {
         const errorData = await response.json();
         Alert.alert('Error', errorData.error || 'Failed to log period.');
@@ -137,6 +127,35 @@ const CalendarScreen = () => {
     } catch (error) {
       console.error('Error logging period:', error);
       Alert.alert('Error', 'Failed to log period. Please try again.');
+    }
+  };
+
+  const handleDeletePeriod = async () => {
+    try {
+      const accessToken = await AsyncStorage.getItem('accessToken');
+      const response = await fetch(`${API_BASE_URL}/api/log-period/${selectedDate}/`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+  
+      if (response.ok) {
+        setLoggedDates((prev) => {
+          const updatedDates = { ...prev };
+          delete updatedDates[selectedDate];
+          return updatedDates;
+        });
+        setIsPeriodLogged(false); 
+        Alert.alert('Success', 'Period log deleted successfully!');
+      } else {
+        const errorData = await response.json();
+        Alert.alert('Error', errorData.error || 'Failed to delete period.');
+      }
+    } catch (error) {
+      console.error('Error deleting period:', error);
+      Alert.alert('Error', 'Failed to delete period. Please try again.');
     }
   };
 
@@ -300,12 +319,12 @@ const CalendarScreen = () => {
             {/* Log Buttons */}
             <View style={styles.buttonContainer}>
               {workoutsByDate[selectedDate] ? (
-                <TouchableOpacity style={ isPeriodLogged ? styles.loggedPeriodButton : styles.logPeriodButton } onPress={handleLogPeriod} >
+                <TouchableOpacity style={ isPeriodLogged ? styles.loggedPeriodButton : styles.logPeriodButton } onPress={isPeriodLogged ? handleDeletePeriod : handleLogPeriod} >
                   <Text style={styles.logPeriodButtonText}>{isPeriodLogged ? 'Period Logged!' : 'Log Period'}</Text>
                 </TouchableOpacity>
               ) : (
                 <View>
-                  <TouchableOpacity style={ isPeriodLogged ? styles.loggedPeriodButton : styles.logPeriodButton } onPress={handleLogPeriod} >
+                  <TouchableOpacity style={ isPeriodLogged ? styles.loggedPeriodButton : styles.logPeriodButton } onPress={isPeriodLogged ? handleDeletePeriod : handleLogPeriod} >
                     <Text style={styles.logPeriodButtonText}>{isPeriodLogged ? 'Period Logged!' : 'Log Period'}</Text>
                   </TouchableOpacity>
                   <Button title="Add Workout" onPress={handleAddWorkout} size='small' />
