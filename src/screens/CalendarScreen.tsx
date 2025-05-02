@@ -196,7 +196,7 @@ const CalendarScreen = () => {
   const handleDeleteWorkoutLog = async () => {
     try {
       const accessToken = await AsyncStorage.getItem('accessToken');
-      const response = await fetch(`${API_BASE_URL}/api/workout-logs/${selectedDate}`, {
+      const response = await fetch(`${API_BASE_URL}/api/workout-logs/${selectedDate}/`, {
           method: 'DELETE',
           headers: {
               'Content-Type': 'application/json',
