@@ -48,7 +48,6 @@ const SignupScreen = ({ navigation }: SignupScreenProps) => {
     }
 
     try {
-      console.log('Signing up with:', name, email, password, confirmPassword);
       setLoading(true); 
       const response = await fetch(`${API_BASE_URL}/api/signup/`, {
         method: 'POST',
