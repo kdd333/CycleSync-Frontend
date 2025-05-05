@@ -14,7 +14,9 @@ const TermsAndConditionsScreen: React.FC = () => {
             <ArrowLeftIcon width={30} height={30} onPress={() => navigation.goBack()} />
             <View style={styles.topContainer}>
                 <Text style={styles.title}>TERMS & CONDITIONS</Text>
-                <Text>v1.0.0</Text>
+            </View>
+            <View style={styles.versionLabel}>
+                <Text style={styles.versionText}>v1.0.0</Text>
             </View>
             {/* Terms and Conditions Content */}
             <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -58,6 +60,20 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         position: 'relative',
         marginVertical: 20,
+    },
+    versionLabel: {
+        position: 'absolute',
+        top: 75,
+        right: 20,
+    },
+    versionText: {
+        fontSize: 12,
+        color: '#fff',
+        backgroundColor: '#999',
+        borderRadius: 5,
+        padding: 3,
+        margin: 'auto',
+        marginBottom: 20,
     },
     scrollContainer: {
         flexGrow: 1,
