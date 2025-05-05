@@ -17,6 +17,7 @@ const HelpScreen = () => {
             </View>
             <View style={styles.mainContainer}>
                 <Text style={styles.title}>Help Screen</Text>
+                <Text>(Coming Soon)</Text>
             </View>
         </View>
     );
@@ -30,7 +31,7 @@ const styles = StyleSheet.create({
     },
     topContainer: {
         flexDirection: 'row',
-        marginTop: 50,
+        marginTop: 40,
     },
     mainContainer: {
         flex: 1,
