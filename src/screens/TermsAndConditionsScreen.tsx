@@ -14,6 +14,7 @@ const TermsAndConditionsScreen: React.FC = () => {
             <ArrowLeftIcon width={30} height={30} onPress={() => navigation.goBack()} />
             <View style={styles.topContainer}>
                 <Text style={styles.title}>TERMS & CONDITIONS</Text>
+                <Text>v1.0.0</Text>
             </View>
             {/* Terms and Conditions Content */}
             <ScrollView contentContainerStyle={styles.scrollContainer}>
