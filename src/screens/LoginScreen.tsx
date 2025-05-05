@@ -16,8 +16,15 @@ const LoginScreen = ({ navigation }: LoginScreenProps) => {
   const [loading, setLoading] = useState(false); 
 
   const handleLogin = async () => {
-    console.log('Logging in with:', email, password);
+    //console.log('Logging in with:', email, password);
     setLoading(true); 
+
+    if (email == '' || password == '') {
+      Alert.alert('Login Failed', 'Please enter both email and password.');
+      setLoading(false); 
+      return;
+    }
+
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/login/`, {
@@ -32,12 +39,14 @@ const LoginScreen = ({ navigation }: LoginScreenProps) => {
       });
 
       const data = await response.json();
-      console.log('Response:', data);
+      //console.log('Response:', data);
 
       if (response.ok) {
-        console.log('Token:', data.access); 
-        await AsyncStorage.setItem('accessToken', data.access); // Store the access token in AsyncStorage
-        await AsyncStorage.setItem('refreshToken', data.refresh); // Store the refresh token in AsyncStorage
+        console.log('login successful');
+
+        // Store the access and refresh token in AsyncStorage
+        await AsyncStorage.setItem('accessToken', data.access); 
+        await AsyncStorage.setItem('refreshToken', data.refresh); 
         navigation.navigate('Main'); // Navigate to the main screen after successful login
       } else {
         console.log('login failed:', data.error || 'Unknown error');
