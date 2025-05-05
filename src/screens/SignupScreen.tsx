@@ -18,18 +18,37 @@ const SignupScreen = ({ navigation }: SignupScreenProps) => {
   const [loading, setLoading] = useState(false);
 
   const handleSignUp = async () => {
+    // Input validation
+    if (loading) return; // Prevent multiple submissions
+    if (!name.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
+      Alert.alert('Signup Failed', 'Please fill in all fields.');
+      return;
+    }
+
+    if (password.trim() == '' || confirmPassword.trim() == '') {
+      Alert.alert('Signup Failed', 'Please enter both password and confirm password.');
+      return;
+    }
+
     if (!isChecked) {
       Alert.alert('You must accept the terms and conditions to proceed.');
       return;
     }
-
-    console.log('Signing up with:', name, email, password);
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      Alert.alert('Invalid email address! Please enter a valid email.');
+      return;
+    }
+    if (password.length < 8) {
+      Alert.alert('Password must be at least 8 characters long! Please try again.');
+      return;
+    }
     if (password !== confirmPassword) {
-      Alert.alert("Passwords don't match!");
+      Alert.alert("Passwords don't match! Please try again.");
       return;
     }
 
     try {
+      console.log('Signing up with:', name, email, password, confirmPassword);
       setLoading(true); 
       const response = await fetch(`${API_BASE_URL}/api/signup/`, {
         method: 'POST',
@@ -38,8 +57,8 @@ const SignupScreen = ({ navigation }: SignupScreenProps) => {
         },
         body: JSON.stringify({
           name: name,
-          email: email,
-          password: password,
+          email: email.trim(),
+          password: password.trim(),
         }),
       });
 
@@ -84,18 +103,26 @@ const SignupScreen = ({ navigation }: SignupScreenProps) => {
 
       <TextInput
         style={styles.input}
-        placeholder="Password"
+        placeholder="Enter Password"
         value={password}
-        onChangeText={setPassword}
+        onChangeText={(text) => setPassword(text.trim() === '' ? '' : text)}
         secureTextEntry
+        autoCapitalize='none'
+        textContentType='newPassword'
+        autoComplete='password-new'
+        importantForAutofill='no'
       />
 
       <TextInput
         style={styles.input}
         placeholder="Confirm Password"
         value={confirmPassword}
-        onChangeText={setConfirmPassword}
+        onChangeText={(text) => setConfirmPassword(text.trim() === '' ? '' : text)}
         secureTextEntry
+        autoCapitalize='none'
+        textContentType='newPassword'
+        autoComplete='password-new'
+        importantForAutofill='no'
       />
 
       {/* Checkbox for Terms and Conditions */}
