@@ -6,6 +6,7 @@ import KeyIcon from '../assets/icons/key.svg';
 import MoonIcon from '../assets/icons/moon.svg';
 import ScrollIcon from '../assets/icons/scroll.svg';
 import RightArrowIcon from '../assets/icons/rightarrow.svg';
+import WarningTriangleIcon from '../assets/icons/warningtriangle.svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigator'; 
@@ -167,6 +168,54 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
             console.error('Error logging out:', error);
             Alert.alert('Error', 'An error occurred while logging out. Please try again later.');
         }
+    };
+
+    const handleDeleteAccount = async () => {
+        // Handle delete account functionality for delete account button
+        Alert.alert(
+            'Delete Account',
+            'Are you sure you want to delete your account? This action cannot be undone.',
+            [
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Delete',
+                    onPress: async () => {
+                        try {
+                            const accessToken = await AsyncStorage.getItem('accessToken'); 
+                            if (!accessToken) {
+                                console.log('No access token found');
+                                Alert.alert('Error', 'No access token found. Please log in again.');
+                                return;
+                            }
+
+                            const response = await fetch(`${API_BASE_URL}/api/delete-account/`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    Authorization: `Bearer ${accessToken}`, 
+                                },
+                            });
+
+                            if (response.ok) {
+                                console.log('Account deleted successfully');
+                                Alert.alert('Success', 'Your account has been deleted successfully.');
+                                handleLogout(); // Logout after account deletion
+                            } else {
+                                console.log('Failed to delete account:', response.statusText);
+                                Alert.alert('Error', 'Failed to delete account. Please try again later.');
+                            }
+
+                        } catch (error) {
+                            console.error('Error deleting account:', error);
+                            Alert.alert('Error', 'An error occurred while deleting your account. Please try again later.');
+                        }
+                    },
+                },
+            ],
+        );
     };
 
     return (
@@ -333,6 +382,11 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
                     <TouchableOpacity style={styles.settingRow} onPress={handleLogout}>
                         <LogoutIcon width={20} height={20} />
                         <Text style={styles.settingText}>Logout</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.settingRow} onPress={handleDeleteAccount}>
+                        <WarningTriangleIcon width={20} height={20} />
+                        <Text style={styles.settingText}>Delete Account</Text>
                     </TouchableOpacity>
                 </View>
             )}
