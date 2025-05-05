@@ -27,6 +27,7 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
     const [lutealLength, setLutealLength] = useState<number>(12);
     const [refreshing, setRefreshing] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => { 
         fetchUserDetails();
@@ -170,8 +171,25 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
         }
     };
 
+    const handleLogoutAfterDeletion = async () => {
+        try {
+            // Clear tokens from AsyncStorage
+            await AsyncStorage.removeItem('accessToken');
+            await AsyncStorage.removeItem('refreshToken');
+    
+            // Navigate to the login screen
+            navigation.navigate('Login');
+        } catch (error) {
+            console.error('Error during logout:', error);
+            Alert.alert('Error', 'An error occurred while logging out. Please try again later.');
+        }
+    };
+
     const handleDeleteAccount = async () => {
         // Handle delete account functionality for delete account button
+        if (isDeleting) return; // Prevent multiple clicks
+
+        // Show confirmation alert before deleting account
         Alert.alert(
             'Delete Account',
             'Are you sure you want to delete your account? This action cannot be undone.',
@@ -183,7 +201,9 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
                 {
                     text: 'Delete',
                     onPress: async () => {
+                        // Proceed with account deletion
                         try {
+                            setIsDeleting(true);
                             const accessToken = await AsyncStorage.getItem('accessToken'); 
                             if (!accessToken) {
                                 console.log('No access token found');
@@ -202,7 +222,7 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
                             if (response.ok) {
                                 console.log('Account deleted successfully');
                                 Alert.alert('Success', 'Your account has been deleted successfully.');
-                                handleLogout(); // Logout after account deletion
+                                handleLogoutAfterDeletion(); // Logout after account deletion
                             } else {
                                 console.log('Failed to delete account:', response.statusText);
                                 Alert.alert('Error', 'Failed to delete account. Please try again later.');
@@ -211,6 +231,8 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
                         } catch (error) {
                             console.error('Error deleting account:', error);
                             Alert.alert('Error', 'An error occurred while deleting your account. Please try again later.');
+                        } finally {
+                            setIsDeleting(false); 
                         }
                     },
                 },
@@ -228,7 +250,7 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
                 }
             >
             {/* Profile Section */}
-            <View style={styles.profileContainer}>
+            <View style={styles.profileContainer}> 
                 <View style={styles.avatarContainer}>
                     <Image 
                         source={require('../assets/icons/user.svg')} // replace with profile image
@@ -384,9 +406,16 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
                         <Text style={styles.settingText}>Logout</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.settingRow} onPress={handleDeleteAccount}>
+                    <TouchableOpacity 
+                        style={[styles.settingRow, isDeleting && { opacity: 0.5 }]} 
+                        onPress={handleDeleteAccount} 
+                        disabled={isDeleting} // Disable button during deletion
+                    >
                         <WarningTriangleIcon width={20} height={20} />
-                        <Text style={styles.settingText}>Delete Account</Text>
+                        <Text style={styles.settingText}>
+                            {isDeleting ? 'Deleting...' : 'Delete Account'}
+                        </Text>
+                        {isDeleting && <ActivityIndicator size="small" color="#F17CBB" />}
                     </TouchableOpacity>
                 </View>
             )}
