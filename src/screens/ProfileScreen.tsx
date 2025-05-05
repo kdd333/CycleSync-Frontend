@@ -120,6 +120,14 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
         }
     };
 
+    const handleEditProfileImage = () => {
+        Alert.alert('Profile Image', 'Coming soon'); 
+    };
+
+    const handleDarkMode = () => {
+        Alert.alert('Dark Mode', 'Coming soon'); 
+    };
+
     const handleLogout = async () => {
         // Handle logout functionality for logout button
         try {
@@ -128,7 +136,7 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
             const accessToken = await AsyncStorage.getItem('accessToken'); 
 
             if (refreshToken) {
-                // call backend logout API to blacklist the refresh token
+                // Call backend logout API to blacklist the refresh token
                 const response = await fetch(`${API_BASE_URL}/api/logout/`, {
                     method: 'POST',
                     headers: {
@@ -178,7 +186,7 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
                         style={styles.avatar}
                     />
                     {isEditing ? (
-                        <TouchableOpacity style={styles.editIcon}>
+                        <TouchableOpacity style={styles.editIcon} onPress={handleEditProfileImage}>
                             <EditIcon width={20} height={20} fill="#F17CBB" />
                         </TouchableOpacity>
                     ) : (
@@ -299,7 +307,7 @@ const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
                 
             ) : (
                 <View style={styles.settingsContainer}>
-                    <TouchableOpacity style={styles.settingRow}>
+                    <TouchableOpacity style={styles.settingRow} onPress={handleDarkMode}>
                         <MoonIcon width={20} height={20} />
                         <Text style={styles.settingText}>Dark Mode</Text>
                         <Switch value={darkMode} onValueChange={() => setDarkMode(!darkMode)} />
