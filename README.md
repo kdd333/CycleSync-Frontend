@@ -103,7 +103,7 @@ Follow the instructions provided in the backend repository to get the local serv
 
 Instructions for setting up the backend server can be found here: https://github.com/kdd333/CycleSync-Backend/blob/main/README.md#setup-instructions
 
-> **IMPORTANT**: If planning to use a seperate devices to run the frontend and backend servers, make sure to run ``` python manage.py runserver 0.0.0.0:8000 ``` to allow devices in your local network to access the server.
+> **IMPORTANT**: If planning to use seperate devices to run the frontend and backend servers, make sure to run ``` python manage.py runserver 0.0.0.0:8000 ``` to allow devices in your local network to access the server.
 
 ### 2. Update Frontend API URL:
 
@@ -117,7 +117,7 @@ If using `localhost`:
 
 ``` export const API_BASE_URL = 'http://localhost:800'; ```
 
-**IMPORTANT**: If using a real mobile device and not a simulator, make sure you set this URL as your machine's local IP address so the device can access the server over Wi-Fi. You can find your machine's local IP address by following these instructions: https://www.wikihow.com/Check-a-Computer-IP-Address
+> **IMPORTANT**: If using a real mobile device and not a simulator, make sure you set this URL as your machine's local IP address so the device can access the server over Wi-Fi. You can find your machine's local IP address by following these instructions: https://www.wikihow.com/Check-a-Computer-IP-Address
 
 ### 3. Start the Expo Server
 
