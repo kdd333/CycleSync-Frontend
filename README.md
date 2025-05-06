@@ -111,11 +111,15 @@ Now in the frontend, open the `config.ts` file (located in the `src/` directory)
 
 If using `127.0.0.1`, the file should look like this:
 
-``` export const API_BASE_URL = 'http://127.0.0.1:800'; ```
+```
+export const API_BASE_URL = 'http://127.0.0.1:8000'; 
+```
 
 If using `localhost`:
 
-``` export const API_BASE_URL = 'http://localhost:800'; ```
+```
+export const API_BASE_URL = 'http://localhost:8000'; 
+```
 
 > **IMPORTANT**: If using a real mobile device and not a simulator, make sure you set this URL as your machine's local IP address so the device can access the server over Wi-Fi. You can find your machine's local IP address by following these instructions: https://www.wikihow.com/Check-a-Computer-IP-Address
 
